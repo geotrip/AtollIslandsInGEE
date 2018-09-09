@@ -5,13 +5,22 @@ The scripts in this repo show how I used Google Earth Engine to measure atoll is
 ## Table of Contents
 
 - [Introduction](#intro)
-- [Setting Up Google Earth Engine](#gee)
-- [Setting Up Data](#data)
-- [Approach 1: Classification](#classification)
-- [Approach 2: NDVI Difference](#ndvi)
+- [Google Earth Engine](#gee)
+- [Creating composite images](#data)
+- [Composite classification](#classification)
 - [Results](#results)
 - [Sources](#bib)
 
 
 <a name="intro"></a>
 ## Introduction
+
+
+<a name="gee"></a>
+## Google Earth Engine
+
+<a name="data"></a>
+## Creating composite images
+
+<a name="classification"></a>
+## Composite classification
