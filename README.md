@@ -7,9 +7,8 @@ The scripts in this repo show how I used Google Earth Engine to measure atoll is
 - [Introduction](#intro)
 - [Google Earth Engine](#gee)
 - [Creating composite images](#data)
-- [Composite classification](#classification)
-- [Results](#results)
-- [Sources](#bib)
+- [Composite classification](#class)
+- [Accuracy assessment](#aa)
 
 
 <a name="intro"></a>
@@ -22,5 +21,5 @@ The scripts in this repo show how I used Google Earth Engine to measure atoll is
 <a name="data"></a>
 ## Creating composite images
 
-<a name="classification"></a>
+<a name="class"></a>
 ## Composite classification
