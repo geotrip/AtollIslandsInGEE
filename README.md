@@ -124,6 +124,9 @@ Map.addLayer(t2median, ls8viz, 'ls8 t2 bqa median',false);
 Map.addLayer(t2Unfilt, ls8viz, 'ls8 t2 unfiltered median',false);
 ```
 
+With cloudmasking and a median reduction, this T2 Landsat composite is looking far better.
+![Good](Images/good.PNG "Cloud contaminated composites")
+
 Now it starts getting a bit more techincal. While you may wish to use only one image collection in your workflow for the sake of simplicity, better results may be possible by combining multiple collections (i.e. T1, T2, masked and unmasked) to acheive maximum coverage and image quality. In the first code snippet the gaps in the filtered T2 collection (where there have been clouds detected for a pixel representing the same geographic location in every image in the collection) are filled by using a unfiltered median or min composite. This ensures no gaps persist, but the tradeoff is that cloud aretifcats may persist in the final composite.
 
 ```javascript
