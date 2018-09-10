@@ -60,13 +60,41 @@ print(ls8t2col)
 print('C1 T2 size: ',ls8t2col.size());
 ```
 
-So now the ls8t2col variable contains all avaialbe scenes which were within the space and date range we specified. However, if we were to preform a reduction (combine all the scenes within the collection into one composite) the results would be very poor, like in the example below. 
+So now the ls8t2col variable contains all available scenes which were within the space and date range we specified. However, if we were to preform a reduction (combine all the scenes within the collection into one composite) the results would be very poor, like in the example below. 
 
 ![Cloudy](Images/cloudy.PNG "Cloud contaminated composites")
 
-Anyone who has attempted passive satellite based remote sensing in the tropics will have struck the same issue: clouds. Given the footprint of a single Landsat scene is some 185 by 180 km, at the latitudes in which coral reefs occur having a cloud free image is the exception rather than the rule. Clouds are the enemy and would need to be removed before any approach to automate island detection could be successfully implemented within GEE.
+Anyone who has attempted passive satellite based remote sensing in the tropics will have struck the same issue: clouds. Given the footprint of a single Landsat scene is some 185 by 180 km, at the latitudes in which coral reefs occur having a cloud free image is definitley the exception rather than the rule. Clouds are the enemy and would need to be removed before any approach to automate island detection could be successfully implemented within GEE.
 
-To solve this issue, all available scenes captured within a given year within the targeted region collated. These scenes were cloud masked (using the QA band and FMask) and the the median value of the remaining pixels was used to create a complete, cloud-free composite image.
+To solve this issue, the cloudy pixels of every scene in the filtered collection were eliminated. This process, called cloud-masking, was acheived in GEE using the BQA band and FMask appended to the Landsat scenes. Note that Fmask is only available in specfic collections in the GEE catalog, and they are labelled as such, e.g. LANDSAT/LC8_L1T_TOA_FMASK.
+
+```javascript
+/*Eliminate pixels tagged as cloud by BQA - useful when less imagery is available, but does give worse results
+compared to only selecting clear pixels (as below)*/
+var bqa = function(image) {
+  var qa = image.select('BQA');
+  var mask = qa.bitwiseAnd(Math.pow(2, 12)).neq(1).and(qa.bitwiseAnd(Math.pow(2, 14)).neq(1)); 
+  return image.updateMask(mask.not())
+};
+
+// Only select the pixels labeled 'clear' in the quality band
+var bqa = function(image) {
+  return image.mask(image.select('BQA').eq(2720));
+};
+```
+
+Using Fmask is very simple. 
+
+```javascript
+// Apply Fmask
+function fmask(image) {
+  return image.updateMask(image.select('fmask').lte(1));
+}
+```
+
+
+
+and the the median value of the remaining pixels was used to create a complete, cloud-free composite image.
 
 There were a number of challenges to overcome for this approach to work effectively. The bright coral sands common to atoll islands were often mistaken for cloud by QA and band, leaving gaps in the final composite which required filling with the unmasked pixel with the lowest (darkest) reflectance. Likewise, the failure of the Landsat-7 scan line corrector (SLC) necessitated the use of scenes captured within a timespan of multiple years for enough data to be avaiable to create a complete composite image.
 
