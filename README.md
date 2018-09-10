@@ -27,7 +27,7 @@ Accordingly, I set out to develop an approach to monitoring atoll island land ar
 
 <a name="data"></a>
 ## Creating composite images
-The included atolls were separated into 278 seperate units via polygons produced in QGIS 3.0. The reasons for this were threefold: such geometries were required to spatially filter the available imagery to retrieve scenes which covered targeted areas; it allowed the composite images to be clipped, saving storage space and reducing the processing load by excluding unrequired pixels; finally, it permitted classified results to be separated as meaningful units. Each ROI was given an individual numerical ID, allowing specific features, or groups of features, to be included or excluded from the analysis. The ROI polygon can be uploaded as a GEE asset [(Learn about that here).](https://developers.google.com/earth-engine/importing)
+The included atolls were separated into 278 seperate units via polygons produced in QGIS 3.0. The reasons for this were threefold: such geometries were required to spatially filter the available imagery to retrieve scenes which covered targeted areas; it allowed the composite images to be clipped, saving storage space and reducing the processing load by excluding unrequired pixels; finally, it permitted classified results to be separated as meaningful units. Each ROI was given an individual numerical ID, allowing specific features, or groups of features, to be included or excluded from the analysis. The ROI polygon can be uploaded as a GEE asset [(learn about that here)](https://developers.google.com/earth-engine/importing). The following code creates an ROI variable, adds to it the map view and centres the map screen on it. 
 
 ```javascript
 //Select roi
@@ -40,6 +40,7 @@ Map.addLayer(roi,{},'ROI');
 Map.centerObject(roi)
 ```
 
+Now that the ROI has been added, we can create an [image collection](https://developers.google.com/earth-engine/ic_creating) from which a composite image will be produced. Adding Landsat data (or any other sources within the EE catalog) is as simple as selecting it from the list add clicking import, or calling it directly in code, as I have done below for the T2 Landsat 8 TOA collection. Obviously, we only want to create a composite of certain areas and within a certain date range - so the inital image collection, which contains every scene in that collection, will need to be filtered. Filtering spatially is simple as we have an ROI object already, but you may also do this manually by using a geometry drawn within GEE instead. Simply call the .filterBounds method on your image collection with the geometry or feature you want to use in brackets. 
 
 ```javascript
 //Select date 
@@ -48,6 +49,12 @@ print('Year: ',year[0])
 print(roi)
 var start = ee.Date(year[0]+'-01-01');
 var end = ee.Date(year[1]+'-12-31');
+
+var ls8t2col = ee.ImageCollection('LANDSAT/LC08/C01/T2_TOA')
+  .filterDate(start,end)
+  .filterBounds(roi)
+print(ls8t2col)
+print('C1 T2 size: ',ls8t2col.size());
 ```
 
 Anyone who has attempted passive satellite based remote sensing in the tropics will have struck the same issue: clouds. Given the footprint of a single Landsat scene is some 185 by 180 km, at the latitudes in which coral reefs occur having a cloud free image is the exception rather than the rule. Clouds are the enemy and would need to be removed before any approach to automate island detection could be successfully implemented within GEE.
