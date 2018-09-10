@@ -29,20 +29,22 @@ Accordingly, I set out to develop an approach to monitoring atoll island land ar
 ## Creating composite images
 The included atolls were separated into 278 seperate units via polygons produced in QGIS 3.0. The reasons for this were threefold: such geometries were required to spatially filter the available imagery to retrieve scenes which covered targeted areas; it allowed the composite images to be clipped, saving storage space and reducing the processing load by excluding unrequired pixels; finally, it permitted classified results to be separated as meaningful units. Each ROI was given an individual numerical ID, allowing specific features, or groups of features, to be included or excluded from the analysis.
 
->//Select roi
->var roi = fsm_roi_limit
->
->//Add roi to the map. Using the inspector tab allows name and id to be verified by clicking.
->Map.addLayer(roi,{},'ROI');
->
->//Map.centerObject(roi)
->
->//Select date 
->var year = ['2014','2014']
->print('Year: ',year[0])
->print(roi)
->var start = ee.Date(year[0]+'-01-01');
->var end = ee.Date(year[1]+'-12-31');
+```javascript
+//Select roi
+var roi = fsm_roi_limit
+
+//Add roi to the map. Using the inspector tab allows name and id to be verified by clicking.
+Map.addLayer(roi,{},'ROI');
+
+//Map.centerObject(roi)
+
+//Select date 
+var year = ['2014','2014']
+print('Year: ',year[0])
+print(roi)
+var start = ee.Date(year[0]+'-01-01');
+var end = ee.Date(year[1]+'-12-31');
+```
 
 
 Anyone who has attempted passive satellite based remote sensing in the tropics will have struck the same issue: clouds. Given the footprint of a single Landsat scene is some 185 by 180 km, at the latitudes in which coral reefs occur having a cloud free image is the exception rather than the rule. Clouds are the enemy and would need to be removed before any approach to automate island detection could be successfully implemented within GEE.
