@@ -28,5 +28,11 @@ Accordingly, I set out to develop an approach to monitoring atoll island land ar
 <a name="data"></a>
 ## Creating composite images
 
+Anyone who has attempted passive satellite based remote sensing in the tropics will have struck the same issue: clouds. Given the footprint of a single Landsat scene is some 185 by 180 km, at the latitudes in which coral reefs occur having a cloud free image is the exception rather than the rule. Clouds are the enemy and would need to be removed before any approach to automate island detection could be successfully implemented within GEE.
+
+To solve this issue, all available scenes captured within a given year within the targeted region collated. These scenes were cloud masked (using the QA band and FMask) and the the median value of the remaining pixels was used to create a complete, cloud-free composite image.
+
+There were a number of challenges to overcome for this approach to work effectively. The bright coral sands common to atoll islands were often mistaken for cloud by QA and band, leaving gaps in the final composite which required filling with the unmasked pixel with the lowest (darkest) reflectance. Likewise, the failure of the Landsat-7 scan line corrector (SLC) necessitated the use of scenes captured within a timespan of multiple years for enough data to be avaiable to create a complete composite image.
+
 <a name="class"></a>
 ## Composite classification
