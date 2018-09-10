@@ -93,12 +93,22 @@ function fmask(image) {
   return image.updateMask(image.select('fmask').lte(1));
 }
 ```
-Here cloud-masking is implemented as a function, and need to be called on the image collection in order to work. To do this for every single scene in the image collection, it needs to be [mapped](https://developers.google.com/earth-engine/ic_mapping). The code below applies the BQA function to the ls8t2col collection. As we will no longer need the BQA band after the cloud filtering has been completed, this is a good time to eleminate bands you will not use. This can be done using the .select function with a list of bands you want to keep, e.g. 'B1','B2','B3','B8'. Since the bands I wanted to keep are contiguous, I used the shorthand 'B[2-8]'.
+Here cloud-masking is implemented as a function, and needs to be called on the image collection in order to work. To do this for every single scene in the image collection, it needs to be [mapped](https://developers.google.com/earth-engine/ic_mapping). The code below applies the BQA function to the ls8t2col collection. As we will no longer need the BQA band after the cloud filtering has been completed, this is a good time to eleminate bands you will not use. This can be done using the .select function with a list of bands you want to keep, e.g. 'B1','B2','B3','B8'. Since the bands I wanted to keep are contiguous, I used the shorthand 'B[2-8]'.
 
 ```javascript
 var t2Filt = ls8t2col
   .map(bqa)
   .select('B[2-8]');
+```
+
+Now it starts getting a bit more techincal. While you may wish to use only one image collection in your workflow for the sake of simplicity, better results may be possible by combining multiple collections (i.e. T1, T2, masked and unmasked) to acheive maximum coverage and image quality.
+
+```javascript
+// Here is where the T1 results can be cut out and replaced with T2. Can give better results. 
+ls8t1col = ls8t1col.clip(roi
+.filter(ee.Filter.neq('Id',9))
+.filter(ee.Filter.neq('Id',10))
+)
 ```
 
 and the the median value of the remaining pixels was used to create a complete, cloud-free composite image.
