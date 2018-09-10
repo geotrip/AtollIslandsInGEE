@@ -68,7 +68,7 @@ Anyone who has attempted passive satellite based remote sensing in the tropics w
 
 To solve this issue, the cloudy pixels of every scene in the filtered collection were eliminated. This process, called cloud-masking, was acheived in GEE using the BQA band and FMask appended to the Landsat scenes. Note that Fmask is only available in specfic collections in the GEE catalog, and they are labelled as such, e.g. LANDSAT/LC8_L1T_TOA_FMASK.
 
-BQA uses a bitwise system to flag pixels likely to have a range of issues such as cloud contamination. More infomation on this can be found [here](https://landsat.usgs.gov/qualityband). However, I found that only using pixels lablelled as 'clear' worked well - im sure with more work this approach could be improved. 
+BQA uses a bitwise system to flag pixels likely to have a range of issues such as cloud contamination. More infomation on this can be found [here](https://landsat.usgs.gov/qualityband). However, I found that only using pixels lablelled as 'clear' worked well (im sure with more work this approach could be improved). 
 
 ```javascript
 /*Eliminate pixels tagged as cloud by BQA - useful when less imagery is available, but does give worse results
@@ -92,6 +92,13 @@ Using Fmask is very simple, but the Fmask collections are being deprecated, so u
 function fmask(image) {
   return image.updateMask(image.select('fmask').lte(1));
 }
+```
+Here cloud-masking is implemented as a function, and need to be called on the image collection in order to work. To do this for every single scene in the image collection, it needs to be [mapped](https://developers.google.com/earth-engine/ic_mapping). The code below applies the BQA function to the ls8t2col collection. As we will no longer need the BQA band after the cloud filtering has been completed, this is a good time to eleminate bands you will not use. This can be done using the .select function with a list of bands you want to keep, e.g. 'B1','B2','B3','B8'. Since the bands I wanted to keep are contiguous, I used the shorthand 'B[2-8]'.
+
+```javascript
+var t2Filt = ls8t2col
+  .map(bqa)
+  .select('B[2-8]');
 ```
 
 and the the median value of the remaining pixels was used to create a complete, cloud-free composite image.
