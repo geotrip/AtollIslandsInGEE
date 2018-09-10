@@ -101,6 +101,8 @@ var t2Filt = ls8t2col
   .select('B[2-8]');
 ```
 
+Now that we have removed the cloudy pixels from each image in the collection, we can produce a composite image. To do this, the image collection needs to be converted into a single image. In GEE, going from multiple (an image collection) to single (a single composite) is achieved using a [reducer](https://developers.google.com/earth-engine/reducers_intro).
+
 Now it starts getting a bit more techincal. While you may wish to use only one image collection in your workflow for the sake of simplicity, better results may be possible by combining multiple collections (i.e. T1, T2, masked and unmasked) to acheive maximum coverage and image quality. In the first code snippet the gaps in the filtered T2 collection (where there have been clouds detected for a pixel representing the same geographic location in every image in the collection) are filled by using a unfiltered median or min composite. This ensures no gaps persist, but the tradeoff is that cloud aretifcats may persist in the final composite.
 
 ```javascript
