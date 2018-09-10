@@ -60,7 +60,7 @@ print(ls8t2col)
 print('C1 T2 size: ',ls8t2col.size());
 ```
 
-So now the ls8t2col variable contains all avaialbe scenes which were within the space and date range we specified. However, if we were to preform a reduction (combine all the scenes within the collection into one composite) the results would be very poor. 
+So now the ls8t2col variable contains all avaialbe scenes which were within the space and date range we specified. However, if we were to preform a reduction (combine all the scenes within the collection into one composite) the results would be very poor, like in the example below. 
 
 ![Cloudy](Images/cloudy.PNG "Cloud contaminated composites")
 
