@@ -101,7 +101,16 @@ var t2Filt = ls8t2col
   .select('B[2-8]');
 ```
 
-Now it starts getting a bit more techincal. While you may wish to use only one image collection in your workflow for the sake of simplicity, better results may be possible by combining multiple collections (i.e. T1, T2, masked and unmasked) to acheive maximum coverage and image quality.
+Now it starts getting a bit more techincal. While you may wish to use only one image collection in your workflow for the sake of simplicity, better results may be possible by combining multiple collections (i.e. T1, T2, masked and unmasked) to acheive maximum coverage and image quality. In the first code snippet the gaps in the filtered T2 collection (where there have been clouds detected for a pixel representing the same geographic location in every image in the collection) are filled by using a unfiltered median or min composite. This ensures no gaps persist, but the tradeoff is that cloud aretifcats may persist in the final composite.
+
+```javascript
+//This code fills in gaps of the filtered t2 median with unfiltered T2 median pixels 
+var fillerMask = t2median.unmask().not();
+var filler = t2Unfilt.updateMask(fillerMask);
+var t2median = (t2median.unmask().add(filler.unmask()))
+```
+
+
 
 ```javascript
 // Here is where the T1 results can be cut out and replaced with T2. Can give better results. 
@@ -109,6 +118,11 @@ ls8t1col = ls8t1col.clip(roi
 .filter(ee.Filter.neq('Id',9))
 .filter(ee.Filter.neq('Id',10))
 )
+
+// This code fills in gaps in the T1 composite with the T2 median pixels 
+var fillerMask = medT1.unmask().not();
+var filler = t2median.updateMask(fillerMask);
+var final = (medT1.unmask().add(filler.unmask())).clip(roi)
 ```
 
 and the the median value of the remaining pixels was used to create a complete, cloud-free composite image.
