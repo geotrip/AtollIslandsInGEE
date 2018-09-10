@@ -44,7 +44,7 @@ Now that the ROI has been added, we can create an [image collection](https://dev
 
 Filtering spatially is simple as we have an ROI object already, but you may also do this manually by using a geometry drawn within GEE instead. Simply call the .filterBounds method on your image collection with the geometry or feature you want to use in brackets. 
 
-Once the image collection has been filtered, the collection is printed to the console, which allows it to easily be reviewed, with the metadata of the collection and each scene availalbe. the size (number of scenes) post filtering is also printed for reference.
+Once the image collection has been filtered, the collection is printed to the console, which allows it to easily be reviewed, with the metadata of the collection and each scene availalbe. The size (number of scenes) of the collection post filtering is also printed for reference.
 
 ```javascript
 //Select date 
