@@ -136,6 +136,8 @@ var filler = t2Unfilt.updateMask(fillerMask);
 var t2median = (t2median.unmask().add(filler.unmask()))
 ```
 
+In the following snippet, individual atolls with poor T1 coverage can be excluded and replaced with the respective T2 version. 
+
 ```javascript
 // Here is where the T1 results can be cut out and replaced with T2. Can give better results. 
 ls8t1col = ls8t1col.clip(roi
@@ -149,9 +151,9 @@ var filler = t2median.updateMask(fillerMask);
 var final = (medT1.unmask().add(filler.unmask())).clip(roi)
 ```
 
-and the the median value of the remaining pixels was used to create a complete, cloud-free composite image.
-
-There were a number of challenges to overcome for this approach to work effectively. The bright coral sands common to atoll islands were often mistaken for cloud by QA and band, leaving gaps in the final composite which required filling with the unmasked pixel with the lowest (darkest) reflectance. Likewise, the failure of the Landsat-7 scan line corrector (SLC) necessitated the use of scenes captured within a timespan of multiple years for enough data to be avaiable to create a complete composite image.
+- pan sharpening
+- NDSV
+- image export. 
 
 <a name="class"></a>
 ## Composite classification
