@@ -68,6 +68,8 @@ Anyone who has attempted passive satellite based remote sensing in the tropics w
 
 To solve this issue, the cloudy pixels of every scene in the filtered collection were eliminated. This process, called cloud-masking, was acheived in GEE using the BQA band and FMask appended to the Landsat scenes. Note that Fmask is only available in specfic collections in the GEE catalog, and they are labelled as such, e.g. LANDSAT/LC8_L1T_TOA_FMASK.
 
+BQA uses a bitwise system to flag pixels likely to have a range of issues such as cloud contamination. More infomation on this can be found [here](https://landsat.usgs.gov/qualityband). However, I found that only using pixels lablelled as 'clear' worked well - im sure with more work this approach could be improved. 
+
 ```javascript
 /*Eliminate pixels tagged as cloud by BQA - useful when less imagery is available, but does give worse results
 compared to only selecting clear pixels (as below)*/
@@ -83,7 +85,7 @@ var bqa = function(image) {
 };
 ```
 
-Using Fmask is very simple. 
+Using Fmask is very simple, but the Fmask collections are being deprecated, so using BQA is the better long term approach. 
 
 ```javascript
 // Apply Fmask
@@ -91,8 +93,6 @@ function fmask(image) {
   return image.updateMask(image.select('fmask').lte(1));
 }
 ```
-
-
 
 and the the median value of the remaining pixels was used to create a complete, cloud-free composite image.
 
