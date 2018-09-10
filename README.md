@@ -93,7 +93,7 @@ function fmask(image) {
   return image.updateMask(image.select('fmask').lte(1));
 }
 ```
-Here cloud-masking is implemented as a function, and needs to be called on the image collection in order to work. To do this for every single scene in the image collection, it needs to be [mapped](https://developers.google.com/earth-engine/ic_mapping). The code below applies the BQA function to the ls8t2col collection. As we will no longer need the BQA band after the cloud filtering has been completed, this is a good time to eleminate bands you will not use. This can be done using the .select function with a list of bands you want to keep, e.g. 'B1','B2','B3','B8'. Since the bands I wanted to keep are contiguous, I used the shorthand 'B[2-8]'.
+Here cloud-masking is implemented as a function, and needs to be called on the image collection in order to work. To do this for every single scene in the image collection, it needs to be [mapped](https://developers.google.com/earth-engine/ic_mapping) using the .map() function. The code below applies the BQA function to the ls8t2col collection. As we will no longer need the BQA band after the cloud filtering has been completed, this is a good time to eleminate bands you will not use. This can be done using the .select() function with a list of bands you want to keep, e.g. 'B1','B2','B3','B8'. Since the bands I wanted to keep are contiguous, I used the shorthand 'B[2-8]'.
 
 ```javascript
 var t2Filt = ls8t2col
@@ -101,7 +101,28 @@ var t2Filt = ls8t2col
   .select('B[2-8]');
 ```
 
-Now that we have removed the cloudy pixels from each image in the collection, we can produce a composite image. To do this, the image collection needs to be converted into a single image. In GEE, going from multiple (an image collection) to single (a single composite) is achieved using a [reducer](https://developers.google.com/earth-engine/reducers_intro).
+Now that we have removed the cloudy pixels from each image in the collection, we can produce a composite image. To do this, the image collection needs to be converted into a single image. In GEE, going from multiple (an image collection) to single (a single composite) is achieved using a [reducer](https://developers.google.com/earth-engine/reducers_intro). There are reducers avaiable for most aggregating statistics, such as mean, median, mode, min, max, standard deviation etc. I found median to provide the best results, with mean being more influenced by the extremes in pixel values contributed by cloud and cloud shadow that persisted through the masking process. Note that the composite is also clipped by the calling the .clip() method with the roi object used as the input geometry. This makes the output much easier to analyse, but does not speed up reduction process. Again, you can also clip images using a geomerty drawn within GEE.
+
+```javascript
+var t2median = t2Filt
+  .median()
+  .clip(roi)
+```
+
+To visualise the result, we need to add the composite to the map as a layer. This is done using the Map.addLayer() function. This function takes an image, an object containing visualization parameters (such as which bands to use, gamma and strectch etc.) and optionally a label and a flag to automatically turn the layer on of off. 
+
+```javascript
+Map.addLayer(t2median, ls8viz, '{bands: 'B4,B3,B2', gamma: 2}', true);
+```
+
+If you are visualzing a number of similar images, it can be cleaner to create a visualization parameter object and calling it for all instances, rather than repeating it for each Map.addLayer() call, as below.
+
+```javascript
+var ls8viz = {bands: 'B4,B3,B2', gamma: 2};
+
+Map.addLayer(t2median, ls8viz, 'ls8 t2 bqa median',false);
+Map.addLayer(t2Unfilt, ls8viz, 'ls8 t2 unfiltered median',false);
+```
 
 Now it starts getting a bit more techincal. While you may wish to use only one image collection in your workflow for the sake of simplicity, better results may be possible by combining multiple collections (i.e. T1, T2, masked and unmasked) to acheive maximum coverage and image quality. In the first code snippet the gaps in the filtered T2 collection (where there have been clouds detected for a pixel representing the same geographic location in every image in the collection) are filled by using a unfiltered median or min composite. This ensures no gaps persist, but the tradeoff is that cloud aretifcats may persist in the final composite.
 
@@ -111,8 +132,6 @@ var fillerMask = t2median.unmask().not();
 var filler = t2Unfilt.updateMask(fillerMask);
 var t2median = (t2median.unmask().add(filler.unmask()))
 ```
-
-
 
 ```javascript
 // Here is where the T1 results can be cut out and replaced with T2. Can give better results. 
