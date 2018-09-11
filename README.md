@@ -84,6 +84,13 @@ var bqa = function(image) {
   return image.mask(image.select('BQA').eq(2720));
 };
 ```
+Note that for landsat 7, the 'clear' value is different:
+
+```javascript
+var bqa = function(image) {
+  return image.updateMask(image.select('BQA').eq(672));
+};
+```
 
 Using Fmask is very simple, but the Fmask collections are being deprecated, so using BQA is the better long term approach. 
 
@@ -151,8 +158,71 @@ var filler = t2median.updateMask(fillerMask);
 var final = (medT1.unmask().add(filler.unmask())).clip(roi)
 ```
 
-- pan sharpening
-- NDSV
+Now that a final composite has been produced, any additional transformations can be undertaken such as pan-sharpening and band ratioing. [Pan-sharpening](https://developers.google.com/earth-engine/image_transforms) is easy to achieve, but make sure that the resulting sharpened image is exported at the resolution of the pan rather than multispectral bands. 
+
+```javascript
+var sharpened = ee.Image.cat([hsv.select('hue'), hsv.select('saturation'), 
+image.select('B8')])
+  .hsvToRgb()
+  .multiply(255)
+  .uint8()
+  .clip(roi);
+```
+
+Using the [normalised difference spectral vector (NDSV) approach](https://ieeexplore.ieee.org/document/6587128/) improved classification perfomance in this study. This involves producing a pseudo multispectral image from all possible unique band ratios. Here this includes all the 30 m resolution B, G, R, NIR, SWIR1 and SWIR2 bands, resulting in 15 band ratios. Band ratioing is a common practice within remote sensing, used to remove the radiometric influence of topography, or to provide a single value for quantiative analysis (e.g. NDVI). Note the implementation below renames the Landsat 8 bands to make blue B1, rather than coastal-aerosol. The Landsat 7 implementation also relabels the bands, allowing the NDSV images produced using both sensors to be directly compared.
+
+```javascript
+var toNDSVLS8 = function(image){
+image = image.select(
+  ['B2', 'B3', 'B4', 'B5', 'B6', 'B7'],
+  ['B1','B2', 'B3', 'B4', 'B5', 'B6']
+  );
+var ndsv = image.normalizedDifference(['B1','B2']).rename('R1');
+ndsv = ndsv.addBands(image.normalizedDifference(['B1','B3']).rename('R2'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B1','B4']).rename('R3'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B1','B5']).rename('R4'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B1','B6']).rename('R5'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B2','B3']).rename('R6'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B2','B4']).rename('R7'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B2','B5']).rename('R8'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B2','B6']).rename('R9'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B3','B4']).rename('R10'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B3','B5']).rename('R11'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B3','B6']).rename('R12'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B4','B5']).rename('R13'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B4','B6']).rename('R14'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B5','B6']).rename('R15'));
+return ndsv.clip(roi)
+};
+```
+
+Landsat 7 implementation:
+
+```javascript
+var toNDSVLS7 = function(image){
+image = image.select(
+  ['B1','B2', 'B3', 'B4', 'B5', 'B7'],
+  ['B1','B2', 'B3', 'B4', 'B5', 'B6']
+  );
+var ndsv = image.normalizedDifference(['B1','B2']).rename('R1');
+ndsv = ndsv.addBands(image.normalizedDifference(['B1','B3']).rename('R2'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B1','B4']).rename('R3'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B1','B5']).rename('R4'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B1','B6']).rename('R5'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B2','B3']).rename('R6'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B2','B4']).rename('R7'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B2','B5']).rename('R8'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B2','B6']).rename('R9'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B3','B4']).rename('R10'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B3','B5']).rename('R11'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B3','B6']).rename('R12'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B4','B5']).rename('R13'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B4','B6']).rename('R14'));
+ndsv = ndsv.addBands(image.normalizedDifference(['B5','B6']).rename('R15'));
+return ndsv.clip(roi)
+};
+```
+
 - image export. 
 
 <a name="class"></a>
