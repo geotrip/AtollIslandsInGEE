@@ -187,6 +187,9 @@ var toPS = function(image){
     .multiply(255)
     .uint8()
 };
+
+// Call the toPS function on an image
+var sharpened = toPS(image)
 ```
 
 
