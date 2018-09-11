@@ -161,6 +161,10 @@ var final = (medT1.unmask().add(filler.unmask())).clip(roi)
 Now that a final composite has been produced, any additional transformations can be undertaken such as pan-sharpening and band ratioing. [Pan-sharpening](https://developers.google.com/earth-engine/image_transforms) is easy to achieve, but make sure that the resulting sharpened image is exported at the resolution of the pan rather than multispectral bands. 
 
 ```javascript
+// Convert the RGB bands to the HSV color space.
+var hsv = image.select(['B3', 'B2', 'B1']).rgbToHsv();
+
+// Sharpen the HSV values with the 15 m pan band (B8) to create a pan-sharpened image
 var sharpened = ee.Image.cat([hsv.select('hue'), hsv.select('saturation'), 
 image.select('B8')])
   .hsvToRgb()
@@ -168,6 +172,23 @@ image.select('B8')])
   .uint8()
   .clip(roi);
 ```
+
+This could also easily be rewritten as a function (here for Landsat 8):
+
+```javascript
+// Sharpen the HSV values with the 15 m pan band (B8) to create a pan-sharpened image
+var toPS = function(image){
+  // Convert the RGB bands to the HSV color space.
+  var hsv = image.select(['B3', 'B2', 'B1']).rgbToHsv();
+  var pan = image.select('B8')
+  // Sharpen the HSV values with the B8 15m band to create a pan-sharpened image
+  return ee.Image.cat([hsv.select('hue'), hsv.select('saturation'), pan])
+    .hsvToRgb()
+    .multiply(255)
+    .uint8()
+};
+```
+
 
 Using the [normalised difference spectral vector (NDSV) approach](https://ieeexplore.ieee.org/document/6587128/) improved classification perfomance in this study. This involves producing a pseudo multispectral image from all possible unique band ratios. Here this includes all the 30 m resolution B, G, R, NIR, SWIR1 and SWIR2 bands, resulting in 15 band ratios. Band ratioing is a common practice within remote sensing, used to remove the radiometric influence of topography, or to provide a single value for quantiative analysis (e.g. NDVI). Note the implementation below renames the Landsat 8 bands to make blue B1, rather than coastal-aerosol. The Landsat 7 implementation also renames the bands, allowing the NDSV images produced using both sensors to be directly compared. Bands may be renamed using the .select() function: two lists of the same length are required as an argument, the first containing the bands you wish to select and the second the new band labels (in order). 
 
