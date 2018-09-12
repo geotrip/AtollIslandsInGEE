@@ -299,3 +299,6 @@ need to specify a higher limit using maxPixels. The current upper limit is 1e13.
 
 <a name="class"></a>
 ## Composite classification
+
+Now that the composite imagery has been generated and saved as assets, they can be classified. Classification involves using a special algorithim (a classifier) to determine which of a user defined group of classes each pixel is most likely to represent. In this case, decisions are based upon the spectral values of each pixel (per band) after the classifier has been trained using a labelled dataset of represenative pixels.
+[GEE Classification video tutorial](https://developers.google.com/earth-engine/tutorials#classification)
