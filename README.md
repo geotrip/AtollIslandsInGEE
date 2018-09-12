@@ -27,7 +27,7 @@ Accordingly, I set out to develop an approach to monitoring atoll island land ar
 
 <a name="data"></a>
 ## Creating composite images
-The included atolls were separated into 278 seperate units via polygons produced in QGIS 3.0. The reasons for this were threefold: such geometries were required to spatially filter the available imagery to retrieve scenes which covered targeted areas; it allowed the composite images to be clipped, saving storage space and reducing the processing load by excluding unrequired pixels; finally, it permitted classified results to be separated as meaningful units. Each ROI was given an individual numerical ID, allowing specific features, or groups of features, to be included or excluded from the analysis. The ROI polygon can be uploaded as a GEE asset [(learn about that here)](https://developers.google.com/earth-engine/importing). The following code creates an ROI variable, adds to it the map view and centres the map screen on it. 
+The included atolls were separated into 278 separate units via polygons produced in QGIS 3.0. The reasons for this were threefold: such geometries were required to spatially filter the available imagery to retrieve scenes which covered targeted areas; it allowed the composite images to be clipped, saving storage space and reducing the processing load by excluding unrequired pixels; finally, it permitted classified results to be separated as meaningful units. Each ROI was given an individual numerical ID, allowing specific features, or groups of features, to be included or excluded from the analysis. The ROI polygon can be uploaded as a GEE asset [(learn about that here)](https://developers.google.com/earth-engine/importing). The following code creates an ROI variable, adds to it the map view and centres the map screen on it. 
 
 ```javascript
 //Select roi
@@ -36,7 +36,7 @@ var roi = fsm_roi_limit
 //Add roi to the map. Using the inspector tab allows name and id to be verified by clicking.
 Map.addLayer(roi,{},'ROI');
 
-//Center the map view on the ROI
+//Centre the map view on the ROI
 Map.centerObject(roi)
 ```
 
@@ -44,11 +44,11 @@ Now that the ROI has been added, we can create an [image collection](https://dev
 
 
 ### Spatial and temporal filtering
-Obviously, we only want to create a composite of certain areas and within a certain date range - so the inital image collection, which contains every scene in that collection, will need to be filtered. Filterining an image collection by date is acheived by calling the filterDate method on your image collection. The method takes a start date and an end date. I was attempting to produce annual composites, so the code reads from a list of years, but you can just as easily manually write in dates in the 'YYYY-MM-DD' format instead.
+Obviously, we only want to create a composite of certain areas and within a certain date range - so the initial image collection, which contains every scene in that collection, will need to be filtered. Filtering an image collection by date is achieved by calling the filterDate method on your image collection. The method takes a start date and an end date. I was attempting to produce annual composites, so the code reads from a list of years, but you can just as easily manually write in dates in the 'YYYY-MM-DD' format instead.
 
 Filtering spatially is simple as we have an ROI object already, but you may also do this manually by using a geometry drawn within GEE instead. Simply call the .filterBounds method on your image collection with the geometry or feature you want to use in brackets.
 
-Once the image collection has been filtered, the collection is printed to the console, which allows it to easily be reviewed, with the metadata of the collection and each scene availalbe. The size (number of scenes) of the collection post filtering is also printed for reference.
+Once the image collection has been filtered, the collection is printed to the console, which allows it to easily be reviewed, with the metadata of the collection and each scene available. The size (number of scenes) of the collection post filtering is also printed for reference.
 
 ```javascript
 //Select date 
@@ -70,11 +70,11 @@ So now the ls8t2col variable contains all available scenes which were within the
 
 ![Cloudy](Images/cloudy.PNG "Cloud contaminated composites")
 
-Anyone who has attempted passive satellite based remote sensing in the tropics will have struck the same issue: clouds. Given the footprint of a single Landsat scene is some 185 by 180 km, at the latitudes in which coral reefs occur having a cloud free image is definitley the exception rather than the rule. Clouds are the enemy and would need to be removed before any approach to automate island detection could be successfully implemented within GEE.
+Anyone who has attempted passive satellite-based remote sensing in the tropics will have struck the same issue: clouds. Given the footprint of a single Landsat scene is some 185 by 180 km, at the latitudes in which coral reefs occur having a cloud free image is definitely the exception rather than the rule. Clouds are the enemy and would need to be removed before any approach to automate island detection could be successfully implemented within GEE.
 
-To solve this issue, the cloudy pixels of every scene in the filtered collection were eliminated. This process, called cloud-masking, was acheived in GEE using the BQA band and FMask appended to the Landsat scenes. Note that Fmask is only available in specfic collections in the GEE catalog, and they are labelled as such, e.g. LANDSAT/LC8_L1T_TOA_FMASK.
+To solve this issue, the cloudy pixels of every scene in the filtered collection were eliminated. This process, called cloud-masking, was achieved in GEE using the BQA band and Fmask appended to the Landsat scenes. Note that Fmask is only available in specific collections in the GEE catalog, and they are labelled as such, e.g. LANDSAT/LC8_L1T_TOA_FMASK.
 
-BQA uses a bitwise system to flag pixels likely to have a range of issues such as cloud contamination. More infomation on this can be found [here](https://landsat.usgs.gov/qualityband). However, I found that only using pixels lablelled as 'clear' worked well (im sure with more work this approach could be improved). 
+BQA uses a bitwise system to flag pixels likely to have a range of issues such as cloud contamination. More information on this can be found [here](https://landsat.usgs.gov/qualityband). However, I found that only using pixels labelled as 'clear' worked well (I’m sure with more work this approach could be improved). 
 
 ```javascript
 /*Eliminate pixels tagged as cloud by BQA - useful when less imagery is available, but does give worse results
@@ -106,7 +106,7 @@ function fmask(image) {
   return image.updateMask(image.select('fmask').lte(1));
 }
 ```
-Here cloud-masking is implemented as a function, and needs to be called on the image collection in order to work. To do this for every single scene in the image collection, it needs to be [mapped](https://developers.google.com/earth-engine/ic_mapping) using the .map() function. The code below applies the BQA function to the ls8t2col collection. As we will no longer need the BQA band after the cloud filtering has been completed, this is a good time to eleminate bands you will not use. This can be done using the .select() function with a list of bands you want to keep, e.g. 'B1','B2','B3','B8'. Since the bands I wanted to keep are contiguous, I used the shorthand 'B[2-8]'.
+Here cloud-masking is implemented as a function, and needs to be called on the image collection in order to work. To do this for every single scene in the image collection, it needs to be [mapped](https://developers.google.com/earth-engine/ic_mapping) using the .map() function. The code below applies the BQA function to the ls8t2col collection. As we will no longer need the BQA band after the cloud filtering has been completed, this is a good time to eliminate bands you will not use. This can be done using the .select() function with a list of bands you want to keep, e.g. 'B1','B2','B3','B8'. Since the bands I wanted to keep are contiguous, I used the shorthand 'B[2-8]'.
 
 ```javascript
 var t2Filt = ls8t2col
@@ -114,7 +114,7 @@ var t2Filt = ls8t2col
   .select('B[2-8]');
 ```
 
-Now that we have removed the cloudy pixels from each image in the collection, we can produce a composite image. To do this, the image collection needs to be converted into a single image. In GEE, going from multiple (an image collection) to single (a single composite) is achieved using a [reducer](https://developers.google.com/earth-engine/reducers_intro). There are reducers avaiable for most aggregating statistics, such as mean, median, mode, min, max, standard deviation etc. I found median to provide the best results, with mean being more influenced by the extremes in pixel values contributed by cloud and cloud shadow that persisted through the masking process. Note that the composite is also clipped by the calling the .clip() method with the roi object used as the input geometry. This makes the output much easier to analyse, but does not speed up reduction process. Again, you can also clip images using a geomerty drawn within GEE.
+Now that we have removed the cloudy pixels from each image in the collection, we can produce a composite image. To do this, the image collection needs to be converted into a single image. In GEE, going from multiple (an image collection) to single (a single composite) is achieved using a [reducer](https://developers.google.com/earth-engine/reducers_intro). There are reducers available for most aggregating statistics, such as mean, median, mode, min, max, standard deviation etc. I found median to provide the best results, with mean being more influenced by the extremes in pixel values contributed by cloud and cloud shadow that persisted through the masking process. Note that the composite is also clipped by the calling the .clip() method with the roi object used as the input geometry. This makes the output much easier to analyse, but does not speed up reduction process. Again, you can also clip images using a geometry drawn within GEE.
 
 ```javascript
 var t2median = t2Filt
@@ -124,13 +124,13 @@ var t2median = t2Filt
 
 
 ### Visualising results
-To visualise the result, we need to add the composite to the map as a layer. This is done using the Map.addLayer() function. This function takes an image, an object containing visualization parameters (such as which bands to use, gamma and strectch etc.) and optionally a label and a flag to automatically turn the layer on of off (this can be useful if you have many layers, but only want GEE to process the one you are interested in at the time). 
+To visualise the result, we need to add the composite to the map as a layer. This is done using the Map.addLayer() function. This function takes an image, an object containing visualization parameters (such as which bands to use, gamma and stretch etc.) and optionally a label and a flag to automatically turn the layer on or off (this can be useful if you have many layers, but only want GEE to process the one you are interested in at the time). 
 
 ```javascript
 Map.addLayer(t2median, ls8viz, '{bands: 'B4,B3,B2', gamma: 2}', true);
 ```
 
-If you are visualzing a number of similar images, it can be cleaner to create a visualization parameter object and calling it for all instances, rather than repeating it for each Map.addLayer() call, as below.
+If you are visualising a number of similar images, it can be cleaner to create a visualization parameter object and calling it for all instances, rather than repeating it for each Map.addLayer() call, as below.
 
 ```javascript
 var ls8viz = {bands: 'B4,B3,B2', gamma: 2};
@@ -139,12 +139,13 @@ Map.addLayer(t2median, ls8viz, 'ls8 t2 bqa median',false);
 Map.addLayer(t2Unfilt, ls8viz, 'ls8 t2 unfiltered median',false);
 ```
 
-With cloudmasking and a median reduction, this T2 Landsat composite is looking far better.
+With cloud-masking and a median reduction, this T2 Landsat composite is looking far better.
 ![Good](Images/good.PNG "Cloud contaminated composites")
 
 
 ### Combining multiple image collections
-Now it starts getting a bit more techincal. While you may wish to use only one image collection in your workflow for the sake of simplicity, better results may be possible by combining multiple collections (i.e. T1, T2, masked and unmasked) to acheive maximum coverage and image quality. In the first code snippet the gaps in the filtered T2 collection (where there have been clouds detected for a pixel representing the same geographic location in every image in the collection) are filled by using a unfiltered median or min composite. This ensures no gaps persist, but the tradeoff is that cloud aretifcats may persist in the final composite.
+Now it starts getting a bit more technical. While you may wish to use only one image collection in your workflow for the sake of simplicity, better results may be possible by combining multiple collections (i.e. T1, T2, masked and unmasked) to achieve maximum coverage and image quality. In the first code snippet the gaps in the filtered T2 collection (where there have been clouds detected for a pixel representing the same geographic location in every image in the collection) are filled by using an unfiltered median or min composite. This ensures no gaps persist, but the trade-off is that cloud artefacts may persist in the final composite.
+
 
 ```javascript
 //This code fills in gaps of the filtered t2 median with unfiltered T2 median pixels 
@@ -172,7 +173,7 @@ var final = (medT1.unmask().add(filler.unmask())).clip(roi)
 Now that a final composite has been produced, any additional transformations can be undertaken such as pan-sharpening and band ratioing. [Pan-sharpening](https://developers.google.com/earth-engine/image_transforms) is easy to achieve, but make sure that the resulting sharpened image is exported at the resolution of the pan rather than multispectral bands. 
 
 ```javascript
-// Convert the RGB bands to the HSV color space.
+// Convert the RGB bands to the HSV colour space.
 var hsv = image.select(['B3', 'B2', 'B1']).rgbToHsv();
 
 // Sharpen the HSV values with the 15 m pan band (B8) to create a pan-sharpened image
@@ -205,7 +206,7 @@ var sharpened = toPS(image)
 
 
 ### NDSV
-Using the [normalised difference spectral vector (NDSV) approach](https://ieeexplore.ieee.org/document/6587128/) improved classification perfomance in this study. This involves producing a pseudo multispectral image from all possible unique band ratios. Here this includes all the 30 m resolution B, G, R, NIR, SWIR1 and SWIR2 bands, resulting in 15 band ratios. Band ratioing is a common practice within remote sensing, used to remove the radiometric influence of topography, or to provide a single value for quantiative analysis (e.g. NDVI). Note the implementation below renames the Landsat 8 bands to make blue B1, rather than coastal-aerosol. The Landsat 7 implementation also renames the bands, allowing the NDSV images produced using both sensors to be directly compared. Bands may be renamed using the .select() function: two lists of the same length are required as an argument, the first containing the bands you wish to select and the second the new band labels (in order). 
+Using the [normalised difference spectral vector (NDSV) approach](https://ieeexplore.ieee.org/document/6587128/) improved classification performance in this study. This involves producing a pseudo multispectral image from all possible unique band ratios. Here this includes all the 30 m resolution B, G, R, NIR, SWIR1 and SWIR2 bands, resulting in 15 band ratios. Band ratioing is a common practice within remote sensing, used to remove the radiometric influence of topography, or to provide a single value for quantitative analysis (e.g. NDVI). Note the implementation below renames the Landsat 8 bands to make blue B1, rather than coastal-aerosol. The Landsat 7 implementation also renames the bands, allowing the NDSV images produced using both sensors to be directly compared. Bands may be renamed using the .select() function: two lists of the same length are required as an argument, the first containing the bands you wish to select and the second the new band labels (in order). 
 
 ```javascript
 var toNDSVLS8 = function(image){
@@ -258,7 +259,8 @@ ndsv = ndsv.addBands(image.normalizedDifference(['B5','B6']).rename('R15'));
 return ndsv.clip(roi)
 };
 ```
-Also note that both the Landsat 8 and Landsat 7 NDSV code snippets are fuctions, and thus must be called on the image object (which contains the required bands) to produce an NDSV image. As this is generally done after your image collection has been reduced to a single image (i.e. your final composite) you do not need to use .map() (though you could if you wanted to apply NDSV to every image in a collection). Instead, it is simply called like so:
+
+Also note that both the Landsat 8 and Landsat 7 NDSV code snippets are functions, and thus must be called on the image object (which contains the required bands) to produce an NDSV image. As this is generally done after your image collection has been reduced to a single image (i.e. your final composite) you do not need to use .map() (though you could if you wanted to apply NDSV to every image in a collection). Instead, it is simply called like so:
 
 ```javascript
 var nd = toNDSVLS7(image)
@@ -268,7 +270,7 @@ var nd = toNDSVLS7(image)
 
 Depending on the size of your study area and the number of scenes being reduced, it make take some considerable time for GEE to process the final composite. You may also notice that the composite takes a while to reload when the zoom level is changed - this is because GEE processes at the scale set by the zoom level - esentially a level in the [pyramid](https://developers.google.com/earth-engine/scale) approach common to many GIS platforms.
 
-Any subsequent calculations that rely on the the final composite will also be slow, since it will need to be computed beforehand. Some more complex calculations, such as classification, may not work at all, timing out or running over the GEE user memory limit. This issue becomes magnified when trying to deal with multiple composites covering different date ranges - clearly processing multiple composites within the same script would be difficult and highly inefficient. To address this issue, images and features that are created within GEE scripts may be exported as a GEE [asset](https://developers.google.com/earth-engine/exporting). After export, assets may be imported into a script from the assets tab (on the left of the window by default). Imported assets perform much better in complex calculations, as less processing needs to be done 'on the fly'. Both images and features may also be exported to the drive of the google account associatied with GEE, allowing data produced in GEE to be used outside of it in the traditional matter. The following code snippet shows how the final composite (finalComp) is exported as a GEE asset. There are a few things to note here: the Export.image.toAsset() function takes a number of arguments, but not all are required, and some (such as scale) make others redundant. In cases like these, it can be easier to use curly brackets {} within the function brackets (). This allows the arguments to be specifically called by name and followed by : before answering the argument as normal. 
+Any subsequent calculations that rely on the final composite will also be slow, since it will need to be computed beforehand. Some more complex calculations, such as classification, may not work at all, timing out or running over the GEE user memory limit. This issue becomes magnified when trying to deal with multiple composites covering different date ranges - clearly processing multiple composites within the same script would be difficult and highly inefficient. To address this issue, images and features that are created within GEE scripts may be exported as a GEE [asset](https://developers.google.com/earth-engine/exporting). After export, assets may be imported into a script from the assets tab (on the left of the window by default). Imported assets perform much better in complex calculations, as less processing needs to be done 'on the fly'. Both images and features may also be exported to the drive of the google account associated with GEE, allowing data produced in GEE to be used outside of it in the traditional matter. The following code snippet shows how the final composite (finalComp) is exported as a GEE asset. There are a few things to note here: the Export.image.toAsset() function takes a number of arguments, but not all are required, and some (such as scale) make others redundant. In cases like these, it can be easier to use curly brackets { } within the function brackets ( ). This allows the arguments to be specifically called by name and followed by : before answering the argument as normal. This can also make it clearer what each argument in a complex function is doing, improving readability.
 
 ```javascript
 Export.image.toAsset({
@@ -279,6 +281,8 @@ Export.image.toAsset({
   scale: 30, 
   maxPixels: 1e13});
 ```
+
+A couple of these arguments warrant further discussion. The description and assetId arguments are strings (i.e. text), but you can concatenate variable values onto text using +. In this example the variables **place** and **year** are concatenated to save having to rewrite each when the area or timespan of the composite being generated is changed (these variables are defined at the top of the code, and the year variable was also used to define the time range during the temporal filtering of the image collection). 
 
 <a name="class"></a>
 ## Composite classification
