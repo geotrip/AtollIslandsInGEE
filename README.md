@@ -251,10 +251,10 @@ Also note that both the Landsat 8 and Landsat 7 NDSV code snippets are fuctions,
 ```javascript
 var nd = toNDSVLS7(image)
 ```
+### Image Export
 
 Depending on the size of your study area and the number of scenes being reduced, it make take considerable time for GEE to process the final composite. You may also notice that the composite takes a while to reload when the zoom level is changed - this is because GEE processes at the scale set by the zoom level - esentially a level in the [pyramid](https://developers.google.com/earth-engine/scale) approach common to many GIS platforms. 
 
-- image export. 
 
 <a name="class"></a>
 ## Composite classification
