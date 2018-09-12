@@ -140,6 +140,7 @@ Map.addLayer(t2Unfilt, ls8viz, 'ls8 t2 unfiltered median',false);
 ```
 
 With cloud-masking and a median reduction, this T2 Landsat composite is looking far better.
+
 ![Good](Images/good.PNG "Cloud contaminated composites")
 
 
