@@ -40,7 +40,11 @@ Map.addLayer(roi,{},'ROI');
 Map.centerObject(roi)
 ```
 
-Now that the ROI has been added, we can create an [image collection](https://developers.google.com/earth-engine/ic_creating) from which a composite image will be produced. Adding Landsat data (or any other sources within the EE catalog) is as simple as selecting it from the list add clicking import, or calling it directly in code, as I have done below for the T2 Landsat 8 TOA collection (this process is exactly the same for any other image collections, e.g. T1 TOA, T1 SR). Obviously, we only want to create a composite of certain areas and within a certain date range - so the inital image collection, which contains every scene in that collection, will need to be filtered. Filterining an image collection by date is acheived by calling the filterDate method on your image collection. The method takes a start date and an end date. I was attempting to produce annual composites, so the code reads from a list of years, but you can just as easily manually write in dates in the 'YYYY-MM-DD' format instead.
+Now that the ROI has been added, we can create an [image collection](https://developers.google.com/earth-engine/ic_creating) from which a composite image will be produced. Adding Landsat data (or any other sources within the EE catalog) is as simple as selecting it from the list add clicking import, or calling it directly in code, as I have done below for the T2 Landsat 8 TOA collection (this process is exactly the same for any other image collections, e.g. T1 TOA, T1 SR). 
+
+
+### Spatial and temporal filtering
+Obviously, we only want to create a composite of certain areas and within a certain date range - so the inital image collection, which contains every scene in that collection, will need to be filtered. Filterining an image collection by date is acheived by calling the filterDate method on your image collection. The method takes a start date and an end date. I was attempting to produce annual composites, so the code reads from a list of years, but you can just as easily manually write in dates in the 'YYYY-MM-DD' format instead.
 
 Filtering spatially is simple as we have an ROI object already, but you may also do this manually by using a geometry drawn within GEE instead. Simply call the .filterBounds method on your image collection with the geometry or feature you want to use in brackets.
 
@@ -59,6 +63,7 @@ var ls8t2col = ee.ImageCollection('LANDSAT/LC08/C01/T2_TOA')
 print(ls8t2col)
 print('C1 T2 size: ',ls8t2col.size());
 ```
+
 
 ### Cloud masking
 So now the ls8t2col variable contains all available scenes which were within the space and date range we specified. However, if we were to preform a reduction (combine all the scenes within the collection into one composite) the results would be very poor, like in the example below. 
@@ -116,6 +121,8 @@ var t2median = t2Filt
   .median()
   .clip(roi)
 ```
+
+
 ### Visualising results
 To visualise the result, we need to add the composite to the map as a layer. This is done using the Map.addLayer() function. This function takes an image, an object containing visualization parameters (such as which bands to use, gamma and strectch etc.) and optionally a label and a flag to automatically turn the layer on of off (this can be useful if you have many layers, but only want GEE to process the one you are interested in at the time). 
 
@@ -134,6 +141,7 @@ Map.addLayer(t2Unfilt, ls8viz, 'ls8 t2 unfiltered median',false);
 
 With cloudmasking and a median reduction, this T2 Landsat composite is looking far better.
 ![Good](Images/good.PNG "Cloud contaminated composites")
+
 
 ### Combining multiple image collections
 Now it starts getting a bit more techincal. While you may wish to use only one image collection in your workflow for the sake of simplicity, better results may be possible by combining multiple collections (i.e. T1, T2, masked and unmasked) to acheive maximum coverage and image quality. In the first code snippet the gaps in the filtered T2 collection (where there have been clouds detected for a pixel representing the same geographic location in every image in the collection) are filled by using a unfiltered median or min composite. This ensures no gaps persist, but the tradeoff is that cloud aretifcats may persist in the final composite.
@@ -195,6 +203,7 @@ var toPS = function(image){
 var sharpened = toPS(image)
 ```
 
+
 ### NDSV
 Using the [normalised difference spectral vector (NDSV) approach](https://ieeexplore.ieee.org/document/6587128/) improved classification perfomance in this study. This involves producing a pseudo multispectral image from all possible unique band ratios. Here this includes all the 30 m resolution B, G, R, NIR, SWIR1 and SWIR2 bands, resulting in 15 band ratios. Band ratioing is a common practice within remote sensing, used to remove the radiometric influence of topography, or to provide a single value for quantiative analysis (e.g. NDVI). Note the implementation below renames the Landsat 8 bands to make blue B1, rather than coastal-aerosol. The Landsat 7 implementation also renames the bands, allowing the NDSV images produced using both sensors to be directly compared. Bands may be renamed using the .select() function: two lists of the same length are required as an argument, the first containing the bands you wish to select and the second the new band labels (in order). 
 
@@ -254,6 +263,7 @@ Also note that both the Landsat 8 and Landsat 7 NDSV code snippets are fuctions,
 ```javascript
 var nd = toNDSVLS7(image)
 ```
+
 ### Image Export
 
 Depending on the size of your study area and the number of scenes being reduced, it make take considerable time for GEE to process the final composite. You may also notice that the composite takes a while to reload when the zoom level is changed - this is because GEE processes at the scale set by the zoom level - esentially a level in the [pyramid](https://developers.google.com/earth-engine/scale) approach common to many GIS platforms. 
