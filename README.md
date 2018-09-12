@@ -287,7 +287,7 @@ Export.image.toAsset({
   scale: 30, 
   maxPixels: 1e13});
 ```
-
+<figcaption> hello world </>
 A couple of these arguments warrant further discussion. The description and assetId arguments are strings (i.e. text), but you can concatenate variable values onto text using +. In this example the variables **place** and **year** are concatenated to save having to rewrite each when the area or timespan of the composite being generated is changed (these variables are defined at the top of the code, and the year variable was also used to define the time range during the temporal filtering of the image collection). 
 
 The region is the geometry of the area you wish to export. Note that this needs to be a single polygon. If you use a multipolygon, the export will fail. An easy way to get around this issue is to either draw a polygon within GEE, or (as above) call the .geometry() and .bounds() methods (in that order) on an existing feature such as an roi polygon. The .geometry() function creates a geometry object from the feature coordinates, and .bounds() creates a single bounding box that contains all of the polygons that the feature may be comprised of. Note that if you do not specify this, it will default to the area of your map view at the time when the function is called (this can be useful when making figures).
@@ -295,6 +295,7 @@ The region is the geometry of the area you wish to export. Note that this needs 
 The scale argument controls the resolution at which your asset will be exported at. This is important to specify, as by default it is set to 1000 m. In most cases this will be the native resolution of your imagery (in this case the multispectral bands of Landsat 8, which are 30 m. If pan-sharpened imagery was being exported instead, this should be set to 15 m). Note that higher resolutions will take up more of your 250 GB asset allowance for the same geographic area. Also note that going beyond the native resolution of your imagery is pointless (i.e. exporting Landsat 8 data at 1 m resolution).
 
 Finally, the maxPixels argument does exactly what it says on the tin. You will get an error if you go above 1e8, in which case you will 
-need to specify a higher limit using maxPixels. The current upper limit is 1e13. If this is still too low, consider using a coarser resolution, a more constrained region, or if using an existing region geometry, splitting it into smaller chunks. 
+need to specify a higher limit using maxPixels. The current upper limit is 1e13. If this is still too low, consider using a coarser resolution, a more constrained region, or if using an existing region geometry, splitting it into smaller chunks.
+
 <a name="class"></a>
 ## Composite classification
