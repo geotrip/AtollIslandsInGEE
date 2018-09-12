@@ -306,5 +306,9 @@ Now that the composite imagery has been generated and saved as assets, they can 
 
 ### Sampling the image
 
+### Training the classifier
+
+### Visualising the classification
+
 <a name="aa"></a>
 ## Accuracy assessment
