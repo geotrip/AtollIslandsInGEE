@@ -192,7 +192,7 @@ var toPS = function(image){
 var sharpened = toPS(image)
 ```
 
-
+#### NDSV
 Using the [normalised difference spectral vector (NDSV) approach](https://ieeexplore.ieee.org/document/6587128/) improved classification perfomance in this study. This involves producing a pseudo multispectral image from all possible unique band ratios. Here this includes all the 30 m resolution B, G, R, NIR, SWIR1 and SWIR2 bands, resulting in 15 band ratios. Band ratioing is a common practice within remote sensing, used to remove the radiometric influence of topography, or to provide a single value for quantiative analysis (e.g. NDVI). Note the implementation below renames the Landsat 8 bands to make blue B1, rather than coastal-aerosol. The Landsat 7 implementation also renames the bands, allowing the NDSV images produced using both sensors to be directly compared. Bands may be renamed using the .select() function: two lists of the same length are required as an argument, the first containing the bands you wish to select and the second the new band labels (in order). 
 
 ```javascript
@@ -251,7 +251,7 @@ Also note that both the Landsat 8 and Landsat 7 NDSV code snippets are fuctions,
 ```javascript
 var nd = toNDSVLS7(image)
 ```
-### Image Export
+#### Image Export
 
 Depending on the size of your study area and the number of scenes being reduced, it make take considerable time for GEE to process the final composite. You may also notice that the composite takes a while to reload when the zoom level is changed - this is because GEE processes at the scale set by the zoom level - esentially a level in the [pyramid](https://developers.google.com/earth-engine/scale) approach common to many GIS platforms. 
 
