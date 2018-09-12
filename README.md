@@ -287,7 +287,7 @@ Export.image.toAsset({
   scale: 30, 
   maxPixels: 1e13});
 ```
-<figcaption> hello world </>
+
 A couple of these arguments warrant further discussion. The description and assetId arguments are strings (i.e. text), but you can concatenate variable values onto text using +. In this example the variables **place** and **year** are concatenated to save having to rewrite each when the area or timespan of the composite being generated is changed (these variables are defined at the top of the code, and the year variable was also used to define the time range during the temporal filtering of the image collection). 
 
 The region is the geometry of the area you wish to export. Note that this needs to be a single polygon. If you use a multipolygon, the export will fail. An easy way to get around this issue is to either draw a polygon within GEE, or (as above) call the .geometry() and .bounds() methods (in that order) on an existing feature such as an roi polygon. The .geometry() function creates a geometry object from the feature coordinates, and .bounds() creates a single bounding box that contains all of the polygons that the feature may be comprised of. Note that if you do not specify this, it will default to the area of your map view at the time when the function is called (this can be useful when making figures).
