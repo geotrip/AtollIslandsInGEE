@@ -60,6 +60,7 @@ print(ls8t2col)
 print('C1 T2 size: ',ls8t2col.size());
 ```
 
+### Cloud masking
 So now the ls8t2col variable contains all available scenes which were within the space and date range we specified. However, if we were to preform a reduction (combine all the scenes within the collection into one composite) the results would be very poor, like in the example below. 
 
 ![Cloudy](Images/cloudy.PNG "Cloud contaminated composites")
@@ -115,7 +116,7 @@ var t2median = t2Filt
   .median()
   .clip(roi)
 ```
-
+### Visualising results
 To visualise the result, we need to add the composite to the map as a layer. This is done using the Map.addLayer() function. This function takes an image, an object containing visualization parameters (such as which bands to use, gamma and strectch etc.) and optionally a label and a flag to automatically turn the layer on of off (this can be useful if you have many layers, but only want GEE to process the one you are interested in at the time). 
 
 ```javascript
@@ -134,6 +135,7 @@ Map.addLayer(t2Unfilt, ls8viz, 'ls8 t2 unfiltered median',false);
 With cloudmasking and a median reduction, this T2 Landsat composite is looking far better.
 ![Good](Images/good.PNG "Cloud contaminated composites")
 
+### Combining multiple image collections
 Now it starts getting a bit more techincal. While you may wish to use only one image collection in your workflow for the sake of simplicity, better results may be possible by combining multiple collections (i.e. T1, T2, masked and unmasked) to acheive maximum coverage and image quality. In the first code snippet the gaps in the filtered T2 collection (where there have been clouds detected for a pixel representing the same geographic location in every image in the collection) are filled by using a unfiltered median or min composite. This ensures no gaps persist, but the tradeoff is that cloud aretifcats may persist in the final composite.
 
 ```javascript
@@ -158,6 +160,7 @@ var filler = t2median.updateMask(fillerMask);
 var final = (medT1.unmask().add(filler.unmask())).clip(roi)
 ```
 
+### Pan-sharpening
 Now that a final composite has been produced, any additional transformations can be undertaken such as pan-sharpening and band ratioing. [Pan-sharpening](https://developers.google.com/earth-engine/image_transforms) is easy to achieve, but make sure that the resulting sharpened image is exported at the resolution of the pan rather than multispectral bands. 
 
 ```javascript
@@ -192,7 +195,7 @@ var toPS = function(image){
 var sharpened = toPS(image)
 ```
 
-#### NDSV
+### NDSV
 Using the [normalised difference spectral vector (NDSV) approach](https://ieeexplore.ieee.org/document/6587128/) improved classification perfomance in this study. This involves producing a pseudo multispectral image from all possible unique band ratios. Here this includes all the 30 m resolution B, G, R, NIR, SWIR1 and SWIR2 bands, resulting in 15 band ratios. Band ratioing is a common practice within remote sensing, used to remove the radiometric influence of topography, or to provide a single value for quantiative analysis (e.g. NDVI). Note the implementation below renames the Landsat 8 bands to make blue B1, rather than coastal-aerosol. The Landsat 7 implementation also renames the bands, allowing the NDSV images produced using both sensors to be directly compared. Bands may be renamed using the .select() function: two lists of the same length are required as an argument, the first containing the bands you wish to select and the second the new band labels (in order). 
 
 ```javascript
@@ -251,7 +254,7 @@ Also note that both the Landsat 8 and Landsat 7 NDSV code snippets are fuctions,
 ```javascript
 var nd = toNDSVLS7(image)
 ```
-#### Image Export
+### Image Export
 
 Depending on the size of your study area and the number of scenes being reduced, it make take considerable time for GEE to process the final composite. You may also notice that the composite takes a while to reload when the zoom level is changed - this is because GEE processes at the scale set by the zoom level - esentially a level in the [pyramid](https://developers.google.com/earth-engine/scale) approach common to many GIS platforms. 
 
