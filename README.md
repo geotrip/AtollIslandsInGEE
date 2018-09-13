@@ -340,6 +340,12 @@ Now that a training dataset has been prepared, it is time to choose a classifer 
 var classifier = ee.Classifier.svm();
 ```
 
+```javascript
+// Train the chosen classifier 
+var fullClassifier = classifier.train(join, 'class', 
+['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9', 'R10', 'R11', 'R12', 'R13', 'R14', 'R15']);
+```
+
 ### Visualising the classification
 
 ![class](Images/class.png "SVM classified image")
