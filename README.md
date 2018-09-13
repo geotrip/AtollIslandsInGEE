@@ -303,11 +303,14 @@ need to specify a higher limit using maxPixels. The current upper limit is 1e13.
 
 Now that the composite imagery has been generated and saved as assets, they can be classified. Classification involves using a special algorithm (a classifier) to determine which of a user defined group of classes each pixel is most likely to represent. In this case, decisions are based upon the spectral values of each pixel (per band) after the classifier has been trained using a labelled dataset of representative pixels. For more information on classification within GEE, see this [GEE Classification video tutorial](https://developers.google.com/earth-engine/tutorials#classification). For the purposes of this tutorial, a single date classification (training data sampled from one image) will be prepared initially, then multi-date classification will be discussed.  
 
-For ease of use, I created a new script for classification, keeping it seperate from the code which produces the composites detailed above. To begin, in a new script I defined the variable **toClassify** with the composite image and clipped it to the roi (the same as the previous script). Note that clipping does not carry over in exported assets: the area clipped out when generating the composite will be all black (i.e. null), but for visualistion purposes it is best to clip this off by clipping the image again.
+For ease of use, I created a new script for classification, keeping it seperate from the code which produces the composites detailed above. To begin, in a new script I defined the variable **toClassify** with the composite image and clipped it to the roi (the same as the previous script). Note that clipping does not carry over in exported assets: the area clipped out when generating the composite will be all black (i.e. null), but for visualistion purposes it is best to clip this off by clipping the image again. This code also adds the image to be classified to the map view (Map.addLayer(...)).
 
 ```javascript
 var toClassify = n17
 toClassify = toClassify.clip(roi);
+
+var ls8viz = {gamma: 2, bands: 'B5,B4,B3'}
+Map.addLayer(toClassify.clip(roi), {gamma: 2.1}, 'to classify');
 ```
 
 ### Creating training samples
@@ -318,6 +321,13 @@ Training samples generally take the form of polygonal geometries within which pi
 
 ### Sampling the image
 
+```javascript
+var training = NDmedian.sampleRegions({
+	collection: Wt.merge(Sh),
+	properties: ['class'],
+	scale: 30
+});
+```
 
 ### Training the classifier
 
