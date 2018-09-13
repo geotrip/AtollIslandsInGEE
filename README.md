@@ -312,6 +312,8 @@ Training samples generally take the form of polygonal geometries within which pi
 
 ### Visualising the classification
 
+![class](Images/class.png "SVM classified image")
+
 <a name="aa"></a>
 ## Accuracy assessment
 
