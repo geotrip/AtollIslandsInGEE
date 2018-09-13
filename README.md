@@ -315,17 +315,18 @@ Map.addLayer(toClassify.clip(roi), {gamma: 2.1}, 'to classify');
 
 ### Creating training samples
 
-Training samples generally take the form of polygonal geometries within which pixels are sampled. As such, they can be created within GEE using the built-in geometry tools, or imported from existing shapefiles etc. The important thing here is that the training samples have a property which describes which class they represent. When using the GEE geometry tools, this can be achieved by clicking the cog icon next to the layer in the geometry list at the top left corner of the map view and selecting to import as a feature or featureCollection. This will allow you to add a property to the training sample, such as 'class' etc. Generally classes are coded by number (i.e. water = 0, vegetation = 1, urban = 2). This allows easy visualisation and later accuracy assessment. The image below shows a composite image with a number of training polygons representing different classes (e.g. black for water, green for vegetation).
+Training samples generally take the form of polygonal geometries within which pixels are sampled. As such, they can be created within GEE using the built-in geometry tools, or imported from existing shapefiles etc. The important thing here is that the training samples have a property which describes which class they represent. When using the GEE geometry tools, this can be achieved by clicking the cog icon next to the layer in the geometry list at the top left corner of the map view and selecting to import as a feature or featureCollection (I found that featureCollection works well in this instance). This will allow you to add a property to the training sample, such as 'class' etc. Generally classes are coded by number (i.e. water = 0, vegetation = 1, urban = 2). This allows easy visualisation and later accuracy assessment. The image below shows a composite image with a number of training polygons representing different classes (e.g. black for water, green for vegetation).
 
 ![train](Images/training.png "Training samples")
 
 ### Sampling the image
 
+Now that the training samples and the image to be sampled from are both present, a training dataset can be built. This is done using the .sampleRegions() function, which is called on the image from which the training data is to be generated. In the code below, my NDSV composite **NDmedian** is being sampled. The .sampleRegions() function has a number of arguments which need to be answered: the collection is the training sample polygons (with a class property) that you are using. In the example below the collection is the merged feature collections for each class (i.e Wt for water, Vg for vegetated etc.) You may also produce this collection of training samples as as a distinct variable prior to using this function instead. The properities argument defines which properties of your training feature collection to copy: in this case, the class property is required. Finally, scale, projection and tilescale are optional arguments (scale defaults to the resolution of the first band of the input image, while tileScale can be useful when undertaking very large number of samples).
+
 ```javascript
 var training = NDmedian.sampleRegions({
-	collection: Wt.merge(Sh),
+	collection: Wt.merge(Sh).merge(Vg).merge(Urb),
 	properties: ['class'],
-	scale: 30
 });
 ```
 
