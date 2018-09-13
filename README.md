@@ -330,7 +330,15 @@ var training = NDmedian.sampleRegions({
 });
 ```
 
-### Training the classifier
+This produces a featureCollection object with each pixel sampled a feature containing the values of that pixel per band, and the class it was labelled as. 
+
+### Choosing and training a classifier
+
+Now that a training dataset has been prepared, it is time to choose a classifer to use and train it. 
+
+```javascript
+var classifier = ee.Classifier.svm();
+```
 
 ### Visualising the classification
 
