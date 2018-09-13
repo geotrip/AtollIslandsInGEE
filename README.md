@@ -8,6 +8,7 @@ The scripts in this repo show how I used Google Earth Engine to measure atoll is
 - [Creating composite images](#data)
 - [Composite classification](#class)
 - [Accuracy assessment](#aa)
+- [Post classification filtering](#filt)
 
 
 <a name="intro"></a>
@@ -306,6 +307,8 @@ Now that the composite imagery has been generated and saved as assets, they can 
 
 Training samples generally take the form of polygonal geometries within which pixels are sampled. As such, they can be created within GEE using the built-in geometry tools, or imported from existing shapefiles etc. The important thing here is that the training samples have a property which describes which class they represent. When using the GEE geometry tools, this can be achieved by clicking the cog icon next to the layer in the geometry list at the top left corner of the map view and selecting to import as a feature or featureCollection. This will allow you to add a property to the training sample, such as 'class' etc. Generally classes are coded by number (i.e. water = 0, vegetation = 1, urban = 2). This allows easy visualisation and later accuracy assessment.
 
+![train](Images/training.png "Training samples")
+
 ### Sampling the image
 
 ### Training the classifier
@@ -318,3 +321,7 @@ Training samples generally take the form of polygonal geometries within which pi
 ## Accuracy assessment
 
 For the results of any classification to be useful, the accuracy must be quantified. No classification will ever be 100% accurate, due to noise in the image, the limitations of the classifier etc. While it would be possible to use the training samples that were already produced to measure accuracy, this presents a number of issues: the training samples are based on pixels for which the correct class is obvious, and as such they are more likely to be correctly classified than a randomly selected pixel outside of the training samples, resulting in an overestimation of classification accuracy. The accuracy value will also be biased by the relative number of pixels sampled through training for each class. For instance, it is simple to generate large training polygons of water in atoll environments, while urban areas tend to be relatively much smaller, resulting in far fewer urban training pixels when compared to water. Thus is water is classified accurately and urban is not, the predominance of water pixels in the training data will give an overestimation of classification accuracy that does not fairly represent all classes. 
+
+
+<a name="filt"></a>
+## Post classification filtering
