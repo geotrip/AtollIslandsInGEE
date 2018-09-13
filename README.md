@@ -334,7 +334,7 @@ This produces a featureCollection object with each pixel sampled a feature conta
 
 ### Choosing and training a classifier
 
-Now that a training dataset has been prepared, it is time to choose a classifer to use and train it. 
+Now that a training dataset has been prepared, it is time to choose a classifer to use and train it. GEE has a many different classifiers available, each with a range of user adjustable parameters. In the code snippet below the **classifier** variable is defined as the GEE Suport Vector Machine (SVM) classifier. The full list (as well as the adjustable parameters for each) can be viewed in the ee.Classifier section of the Docs tab to the left of the map view. 
 
 ```javascript
 var classifier = ee.Classifier.svm();
