@@ -363,3 +363,7 @@ For the results of any classification to be useful, the accuracy must be quantif
 
 <a name="filt"></a>
 ## Post classification filtering
+
+A common practice within classification workflows is post-classification filtering, where the raw classifications are processed to (hopefully) remove the so called 'speckle' (aka 'salt and pepper') effect, where there are numerous single pixels classed as something different to their neighbour. Generally this issue is addressed through the use of a generalising, nieghbourhood based function such as majority filtering, seving etc.
+
+While the cloud-filtering prior to classification is reasonalby effective, it is likely that some cloud artefacts persisted into the final composite and were classified (particually if there was limited image availability for the given location). 
