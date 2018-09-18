@@ -372,6 +372,13 @@ Map.addLayer(classified.clip(roi), {palette: palette, min: 0, max: 4},'classifie
 
 ![class](Images/class.png "SVM classified image")
 
+GEE expert [Gennadii Donchyts](https://twitter.com/gena_d) developed code to add support for [ColorBrewer](http://colorbrewer2.org/), a useful resource for choosing colour schemes for thematic maps with continious or categorical data. The colorbrewer function can be sourced from Gennadii like below. To choose a specific colorbrewer palette, call colorbrewer.Palettes. and then the chosen set (e.g. BuGn, Greys, Set3 etc) and the number of classes or breaks in sqaure brackets. 
+
+```javascript
+var colorbrewer = require('users/gena/packages:colorbrewer')
+var palette = colorbrewer.Palettes.Set2[4]
+```
+
 <a name="aa"></a>
 ## Accuracy assessment
 
