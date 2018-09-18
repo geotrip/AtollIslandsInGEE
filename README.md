@@ -171,6 +171,10 @@ var filler = t2median.updateMask(fillerMask);
 var final = (medT1.unmask().add(filler.unmask())).clip(roi)
 ```
 
+### A quick note on built-in GEE Landsat algorithims
+
+GEE has a number of built-in algorithms specific to particular sensors, including Landsat. These include simpleCloudScore (ee.Algorithms.Landsat.simpleCloudScore()), simpleComposite(ee.Algorithms.Landsat.simpleComposite()) and methods for TOA or SR conversion. These require raw Landsat data, rather than the TOA used here. The simpleCompostie algorithm works very well, and can be used to quickly produce composites of large areas. However, the cloud-masking approach it employs struggles with the bright coral sands found within atoll environments and as such can produce notably inferior results to the (much more involved) workflow outlined above.
+
 ### Pan-sharpening
 Now that a final composite has been produced, any additional transformations can be undertaken such as pan-sharpening and band ratioing. [Pan-sharpening](https://developers.google.com/earth-engine/image_transforms) is easy to achieve, but make sure that the resulting sharpened image is exported at the resolution of the pan rather than multispectral bands. 
 
