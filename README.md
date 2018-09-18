@@ -354,6 +354,8 @@ var fullClassifier = classifier.train({
 });
 ```
 
+
+
 ### Visualising the classification
 
 ![class](Images/class.png "SVM classified image")
