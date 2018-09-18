@@ -353,10 +353,22 @@ var fullClassifier = classifier.train({
   inputProperties: ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9', 'R10', 'R11', 'R12', 'R13', 'R14', 'R15']
 });
 ```
+With the classifier trained, it is simply a case of calling the .classify() function on the image to be classifed, using the trained classifier object as the argument.
 
-
+```javascript
+// Classify the images.
+var classified = toClassify.classify(fullClassifier);
+```
 
 ### Visualising the classification
+
+Now the classification needs to be visualised. This is a bit different to visualising a normal image, as the pixel values now describe a class rather than the brightness (reflectance) within a given spectral window (band). Thus we need to assign a colour to each class, making it easy to understand which class pixels have been allocated to. GEE provides the palette object to achieve this. Palettes can only be used on an image with a single band, and can be used as a ramp (such as for a DEM etc.) or categorically (as here). The palette is a list of colours which is called as part of the visualiation parameters used with the Map.addLayer() function. These colours need to be [CSS style](https://en.wikipedia.org/wiki/X11_color_names) strings (names or hex). For more information on palettes, check the [GEE guide](https://developers.google.com/earth-engine/image_visualization).
+
+```javascript
+var palette = ['LIGHTSKYBLUE', 'DARKGREEN', 'LEMONCHIFFON','ORANGE'];
+
+Map.addLayer(classified.clip(roi), {palette: palette, min: 0, max: 4},'classified '+year);
+```
 
 ![class](Images/class.png "SVM classified image")
 
