@@ -404,6 +404,22 @@ print('Consumer\'s accuracy (comission) (across):', errorMatrix.consumersAccurac
 print('Producer\'s accuracy (omission) (down):', errorMatrix.producersAccuracy());
 ```
 
+Exporting the classified image is very similar to exporting the composite image. However, since the classification is catergorical rather than continious, future visualisation will work better if the 'mode' pyramiding policy is selected. GEE automatically makes lower resolution versions of your images to speed up visualisation when operating at large scales (zoomed out). The pyramiding policy of an image determines how these lower quality versions are generated. The default (mean) works well for normal images as it averages the pixel values when you are zoomed out, but since the average of class values is meaningless, using the most prevalent class (mode) is a better choice. 
+
+```javascript
+//Export the classified result
+Export.image.toAsset({
+  image: classified, 
+  description: year+'_palau_split_urb_veg_SVM_class',
+  assetId: 'palau/class_splitGen/'+year+'_palau_split_urb_veg_class',
+  region: roi.geometry().bounds(), 
+  scale: 30, 
+  maxPixels: 1e13,
+  pyramidingPolicy: {".default": "mode"},
+});
+```
+
+
 <a name="filt"></a>
 ## Post classification filtering
 
