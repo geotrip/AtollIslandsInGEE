@@ -384,6 +384,25 @@ var palette = colorbrewer.Palettes.Set2[4]
 
 For the results of any classification to be useful, the accuracy must be quantified. No classification will ever be 100% accurate, due to noise in the image, the limitations of the classifier etc. While it would be possible to use the training samples that were already produced to measure accuracy, this presents a number of issues: the training samples are based on pixels for which the correct class is obvious, and as such they are more likely to be correctly classified than a randomly selected pixel outside of the training samples, resulting in an overestimation of classification accuracy. The accuracy value will also be biased by the relative number of pixels sampled through training for each class. For instance, it is simple to generate large training polygons of water in atoll environments, while urban areas tend to be relatively much smaller, resulting in far fewer urban training pixels when compared to water. Thus is water is classified accurately and urban is not, the predominance of water pixels in the training data will give an overestimation of classification accuracy that does not fairly represent all classes. 
 
+```javascript
+var testing = toClassify.sampleRegions({
+	collection: palau_aa,
+	properties: ['classification'],
+	scale: 30
+});
+
+var validation = testing.classify(fullClassifier);
+
+// Produce an error matrix 
+var errorMatrix = validation.errorMatrix('class', 'classification');
+
+// Test the classifiers' accuracy. (data, y, x), this can be done with training samples or points of known ground truth
+
+print('Confusion table:', errorMatrix);
+print('Accuracy: (correct/total)', errorMatrix.accuracy());
+print('Consumer\'s accuracy (comission) (across):', errorMatrix.consumersAccuracy());
+print('Producer\'s accuracy (omission) (down):', errorMatrix.producersAccuracy());
+```
 
 <a name="filt"></a>
 ## Post classification filtering
