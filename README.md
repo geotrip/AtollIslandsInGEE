@@ -397,9 +397,17 @@ Generating the accuracy assessment points
 ```javascript
 // Create AA points 
 var aaPoints = classified.stratifiedSample({
-  numPoints: 50, classBand: 'classification', region: roi, dropNulls: true, geometries: true})
+	numPoints: 50, 
+  	classBand: 'classification', 
+	region: roi, 
+	dropNulls: true, 
+	geometries: true})
 
-Export.table.toDrive({collection: aaPoints, description:'aa_points', folder:'seperate_outputs', fileFormat :'SHP'})
+Export.table.toDrive({
+	collection: aaPoints, 
+	description:'aa_points', 
+	folder:'seperate_outputs', 
+	fileFormat :'SHP'})
 ```
 
 
@@ -415,7 +423,8 @@ var validation = testing.classify(fullClassifier);
 // Produce an error matrix 
 var errorMatrix = validation.errorMatrix('class', 'classification');
 
-*/ Test the classifiers' accuracy. (data, y, x), this can be done with training samples or points of known ground truth /*
+*/ Test the classifiers' accuracy. (data, y, x), this can be done with training samples or 
+points of known ground truth /*
 
 print('Confusion table:', errorMatrix);
 print('Accuracy: (correct/total)', errorMatrix.accuracy());
