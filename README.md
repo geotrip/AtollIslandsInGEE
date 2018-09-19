@@ -382,7 +382,26 @@ var palette = colorbrewer.Palettes.Set2[4]
 <a name="aa"></a>
 ## Accuracy assessment
 
-For the results of any classification to be useful, the accuracy must be quantified. No classification will ever be 100% accurate, due to noise in the image, the limitations of the classifier etc. While it would be possible to use the training samples that were already produced to measure accuracy, this presents a number of issues: the training samples are based on pixels for which the correct class is obvious, and as such they are more likely to be correctly classified than a randomly selected pixel outside of the training samples, resulting in an overestimation of classification accuracy. The accuracy value will also be biased by the relative number of pixels sampled through training for each class. For instance, it is simple to generate large training polygons of water in atoll environments, while urban areas tend to be relatively much smaller, resulting in far fewer urban training pixels when compared to water. Thus is water is classified accurately and urban is not, the predominance of water pixels in the training data will give an overestimation of classification accuracy that does not fairly represent all classes. 
+For the results of any classification to be useful, the accuracy must be quantified. No classification will ever be 100% accurate, due to noise in the image, the limitations of the classifier etc. Clearly it is not possible to check every pixel has been correctly classified, so a representative sample is required. 
+
+For the accuracy values to be meaningful, a number of factors must be considered: 
+
+- how many accuracy assessment points are required (what is the required sample size)?
+- how should the points be distributed (what sampling stratergy should be implemented)?
+- what reference material should be used to determine ground truth?
+
+While it would be possible to use the training samples that were already produced to measure accuracy, this presents a number of issues: the training samples are based on pixels for which the correct class is obvious, and as such they are more likely to be correctly classified than a randomly selected pixel outside of the training samples, resulting in an overestimation of classification accuracy. The accuracy value will also be biased by the relative number of pixels sampled through training for each class. For instance, it is simple to generate large training polygons of water in atoll environments, while urban areas tend to be relatively much smaller, resulting in far fewer urban training pixels when compared to water. Thus is water is classified accurately and urban is not, the predominance of water pixels in the training data will give an overestimation of classification accuracy that does not fairly represent all classes. 
+
+Generating the accuracy assessment points
+
+```javascript
+// Create AA points 
+var aaPoints = classified.stratifiedSample({
+  numPoints: 50, classBand: 'classification', region: roi, dropNulls: true, geometries: true})
+
+Export.table.toDrive({collection: aaPoints, description:'aa_points', folder:'seperate_outputs', fileFormat :'SHP'})
+```
+
 
 ```javascript
 var testing = toClassify.sampleRegions({
