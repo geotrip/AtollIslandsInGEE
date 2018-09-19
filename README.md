@@ -412,6 +412,8 @@ Export.table.toDrive({
 
 
 ```javascript
+/* Test the classifiers' accuracy. (data, y, x), this can be done with training samples or 
+points of known ground truth */
 var testing = toClassify.sampleRegions({
 	collection: palau_aa,
 	properties: ['classification'],
@@ -422,10 +424,9 @@ var validation = testing.classify(fullClassifier);
 
 // Produce an error matrix 
 var errorMatrix = validation.errorMatrix('class', 'classification');
+```
 
-/* Test the classifiers' accuracy. (data, y, x), this can be done with training samples or 
-points of known ground truth */
-
+```javascript
 print('Confusion table:', errorMatrix);
 print('Accuracy: (correct/total)', errorMatrix.accuracy());
 print('Consumer\'s accuracy (comission) (across):', errorMatrix.consumersAccuracy());
