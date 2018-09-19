@@ -350,7 +350,8 @@ To train the selected classifier, call the .train() function on it. The required
 var fullClassifier = classifier.train({
   features: training, 
   classProperty: 'class', 
-  inputProperties: ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9', 'R10', 'R11', 'R12', 'R13', 'R14', 'R15']
+  inputProperties: ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 
+  'R8', 'R9', 'R10', 'R11', 'R12', 'R13', 'R14', 'R15']
 });
 ```
 With the classifier trained, it is simply a case of calling the .classify() function on the image to be classifed, using the trained classifier object as the argument.
@@ -390,6 +391,8 @@ For the accuracy values to be meaningful, a number of factors must be considered
 - how should the points be distributed (what sampling stratergy should be implemented)?
 - what reference material should be used to determine ground truth?
 
+
+
 While it would be possible to use the training samples that were already produced to measure accuracy, this presents a number of issues: the training samples are based on pixels for which the correct class is obvious, and as such they are more likely to be correctly classified than a randomly selected pixel outside of the training samples, resulting in an overestimation of classification accuracy. The accuracy value will also be biased by the relative number of pixels sampled through training for each class. For instance, it is simple to generate large training polygons of water in atoll environments, while urban areas tend to be relatively much smaller, resulting in far fewer urban training pixels when compared to water. Thus is water is classified accurately and urban is not, the predominance of water pixels in the training data will give an overestimation of classification accuracy that does not fairly represent all classes. 
 
 Generating the accuracy assessment points
@@ -425,6 +428,8 @@ var validation = testing.classify(fullClassifier);
 // Produce an error matrix 
 var errorMatrix = validation.errorMatrix('class', 'classification');
 ```
+
+Now that the errorMatrix object has been generated, it may be printed to the console. Other accuracy metrics may also be printed by calling additional functions such as .accuracy() and .producersAccuracy() on the matrix object.
 
 ```javascript
 print('Confusion table:', errorMatrix);
