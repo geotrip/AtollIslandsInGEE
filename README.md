@@ -413,6 +413,8 @@ Export.table.toDrive({
 	fileFormat :'SHP'})
 ```
 
+Export to drive
+check against hi-res reference material
 
 ```javascript
 /* Test the classifiers' accuracy. (data, y, x), this can be done with training samples or 
