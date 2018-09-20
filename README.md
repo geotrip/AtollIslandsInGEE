@@ -393,7 +393,7 @@ For the accuracy values to be meaningful, a number of factors must be considered
 
 There are numerous stratergies for how to select reference points: purely random, systematic (i.e. regular), clustered etc. While a purely random distribution within the target area may be the most 'scientific', the nature of atoll island enviroments means that this stratergy isn't workable. 
 
-![aa_image](Images/aa_fig3.emf "AA example")
+![rand image](Images/rand.png "Randomly distributed reference points")
 
 Determining the number of reference points (sample size) is a balance between ensuring a representative sample with the substantial time investment that truthing points against reference data requires. Generally more than 50 points per class are recomended, increasing to 75 - 100 for larger areas (> 400 km<sup>2</sup>) or large numbers of classes (i.e. >12) ([Congalton, 1991](https://www.sciencedirect.com/science/article/pii/003442579190048B)). Much more material on this issue is available, including emperical equations for determining sample size. 
 
