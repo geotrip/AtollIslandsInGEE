@@ -391,11 +391,15 @@ For the accuracy values to be meaningful, a number of factors must be considered
 - how many accuracy assessment/reference points are required (what is the required sample size)?
 - what reference material should be used to determine ground truth?
 
+There are numerous stratergies for how to select reference points: purely random, systematic (i.e. regular), clustered etc. While a purely random distribution within the target area may be the most 'scientific', the nature of atoll island enviroments means that this stratergy isn't workable. 
+
 Determining the number of reference points (sample size) is a balance between ensuring a representative sample with the substantial time investment that truthing points against reference data requires. Generally more than 50 points per class are recomended, increasing to 75 - 100 for larger areas (> 400 km<sup>2</sup>) or large numbers of classes (i.e. >12) ([Congalton, 1991](https://www.sciencedirect.com/science/article/pii/003442579190048B)). Much more material on this issue is available, including emperical equations for determining sample size. 
 
 Note that while it would be possible to use the training samples that were already produced to measure accuracy, this presents a number of issues: the training samples are based on pixels for which the correct class is obvious, and as such they are more likely to be correctly classified than a randomly selected pixel outside of the training samples, resulting in an overestimation of classification accuracy. The accuracy value will also be biased by the relative number of pixels sampled through training for each class. For instance, it is simple to generate large training polygons of water in atoll environments, while urban areas tend to be relatively much smaller, resulting in far fewer urban training pixels when compared to water. Thus is water is classified accurately and urban is not, the predominance of water pixels in the training data will give an overestimation of classification accuracy that does not fairly represent all classes. 
 
-Generating the accuracy assessment points
+### Generating reference points
+GEE has 
+
 
 ```javascript
 // Create AA points 
@@ -454,7 +458,6 @@ Export.image.toAsset({
   pyramidingPolicy: {".default": "mode"},
 });
 ```
-
 
 <a name="filt"></a>
 ## Post classification filtering
