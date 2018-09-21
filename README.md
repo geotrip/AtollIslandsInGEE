@@ -446,10 +446,9 @@ var validation = testing.classify(fullClassifier);
 
 // Produce an error matrix 
 var errorMatrix = validation.errorMatrix('classifica','classification');
-
 ```
 
-Now that the errorMatrix object has been generated, it may be printed to the console. Other accuracy metrics may also be printed by calling additional functions such as accuracy() and producersAccuracy() on the matrix object.
+Now that the errorMatrix object has been generated, it may be printed to the console. Other accuracy metrics may also be printed by calling additional functions such as *accuracy()* and *producersAccuracy()* on the matrix object. This information can be copied from the console for use elsewhere.
 
 ```javascript
 print('Confusion table:', errorMatrix);
