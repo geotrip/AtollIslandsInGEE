@@ -420,7 +420,7 @@ var aaPoints = classified.stratifiedSample({
 	geometries: true})
 ```
 
-Now that the points have been created, they need to ground-truthed against reference material (i.e. ensuring that the reference points have the correct class). This data should be of higher resolution than the imagery being classified and captured at a similar enough time for change to not have occured (which would make the comparison void). There are a number of ways to do this, both within earth engine using a different data source (e.g. Sentinel-2) or outside using other data sources. Given the relative lack of imagery coverage for atoll enivorments, I exported my points as a .shp and ground-truthed against a range of sources, including Google Earth, Planet and RapidEye data for the 2016 year (which had the most data available). The reference points may be exported for ground-truthing using google drive, as in the code snippet below.
+Now that the points have been created, they need to ground-truthed against reference material (i.e. ensuring that the reference points have the correct class). This data should be of higher resolution than the imagery being classified and captured at a similar enough time for change to not have occured (which would make the comparison void). There are a number of ways to do this, both within earth engine using a different data source (e.g. Sentinel-2) or outside using other data sources. Given the relative lack of imagery coverage for atoll enivorments, I exported my points as a .shp and ground-truthed against a range of sources, including Google Earth, Planet and RapidEye data for the 2016 year (which had the most data available). The reference points may be exported for ground-truthing using google drive, as in the code snippet below. Make sure that the fileFormat argument is set to the filetype you wish to use.
 
 ```javascript
 Export.table.toDrive({
@@ -432,19 +432,21 @@ Export.table.toDrive({
 
 Once the points have been ground truthed, they can be uploaded back into GEE. From the Assets tab, click New, then Table upload. Click select, then naviagate to the folder where your data is located and select it (making sure to include the required metadata files in the case of a .shp). Name the file, click ok and it will be 'ingested', becoming avaialbe within your GEE assets.
 
+Once ingested, this data can be used to determince the accuracy of your classification. To do this, use the sampleRegions function again, this time using the reference points (here **fsm_aa**) instead of training samples. These samples are then classifed by the same classifier to produce a validation dataset, which contains two properites, one with the reference ('true') class (here **'classifica'**) and the class alaocated by the classifier (**'classification'**). The two are compared using the errorMatrix() function, as in the code snippet below.
+
 ```javascript
-/* Test the classifiers' accuracy. (data, y, x), this can be done with training samples or 
-points of known ground truth */
+// Test the classifiers' accuracy
 var testing = toClassify.sampleRegions({
-	collection: palau_aa,
-	properties: ['classification'],
+	collection: fsm_aa,
+	properties: ['classifica'],
 	scale: 30
 });
 
 var validation = testing.classify(fullClassifier);
 
 // Produce an error matrix 
-var errorMatrix = validation.errorMatrix('class', 'classification');
+var errorMatrix = validation.errorMatrix('classifica','classification');
+
 ```
 
 Now that the errorMatrix object has been generated, it may be printed to the console. Other accuracy metrics may also be printed by calling additional functions such as .accuracy() and .producersAccuracy() on the matrix object.
