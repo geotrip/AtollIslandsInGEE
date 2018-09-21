@@ -9,6 +9,7 @@ The scripts in this repo show how I used Google Earth Engine to measure atoll is
 - [Composite classification](#class)
 - [Accuracy assessment](#aa)
 - [Post classification filtering](#filt)
+- [Deriving area measurements](#area)
 
 
 <a name="intro"></a>
@@ -479,3 +480,5 @@ A common practice within classification workflows is post-classification filteri
 
 While the cloud-filtering prior to classification is reasonably effective, it is likely that some cloud artefacts persisted into the final composite and were classified (particularly if there was limited image availability for the given location).
 
+<a name="area"></a>
+## Deriving area measurements
