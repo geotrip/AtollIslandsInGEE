@@ -383,7 +383,7 @@ var palette = colorbrewer.Palettes.Set2[4]
 <a name="aa"></a>
 ## Accuracy assessment
 
-For the results of any classification to be useful, the accuracy must be quantified. No classification will ever be 100% accurate, due to noise in the image, the limitations of the classifier etc. Clearly it is not possible to check every pixel has been correctly classified, so a representative sample of reference points is required. 
+For the results of any classification to be useful, the accuracy must be quantified. No classification will ever be 100% accurate, due to noise in the image, the limitations of the classifier etc. Clearly it is not possible to check every pixel has been correctly classified, so a representative sample of reference points is required. This sample may then be ground-truthed (manually corrected) and used to compare how well the classifier preforms.
 
 For the accuracy values to be meaningful, a number of factors must be considered: 
 
@@ -407,18 +407,22 @@ Determining the number of reference points (sample size) is a balance between en
 Note that while it would be possible to use the training samples that were already produced to measure accuracy, this presents a number of issues: the training samples are based on pixels for which the correct class is obvious, and as such they are more likely to be correctly classified than a randomly selected pixel outside of the training samples, resulting in an overestimation of classification accuracy. The accuracy value will also be biased by the relative number of pixels sampled through training for each class. For instance, it is simple to generate large training polygons of water in atoll environments, while urban areas tend to be relatively much smaller, resulting in far fewer urban training pixels when compared to water. Thus is water is classified accurately and urban is not, the predominance of water pixels in the training data will give an overestimation of classification accuracy that does not fairly represent all classes. 
 
 ### Generating reference points
-GEE has 
 
+GEE has a built in function for stratified random sampling, making it very easy to achieve. This function (.stratifiedSample()) takes the number of points (note this is per class, not in total), the band containing the classification, the region to sample in, wether to ignore masked pixels (dropNulls) and wether to include a geometry with each sample (so each sample has a point geometry). The function is called on the classified image, as in the code snippet below.
 
 ```javascript
-// Create AA points 
+// Create AA points
 var aaPoints = classified.stratifiedSample({
 	numPoints: 50, 
   	classBand: 'classification', 
 	region: roi, 
 	dropNulls: true, 
 	geometries: true})
+```
 
+Now that the points have been created, they need to ground-truthed against reference material (i.e. ensuring that the reference points have the correct class). This data should be of higher resolution than the imagery being classified and captured at a similar enough time for change to not have occured (which would make the comparison void). There are a number of ways to do this, both within earth engine using a different data source (e.g. Sentinel-2) or outside using other data sources. Given the relative lack of imagery coverage for atoll enivorments, I exported my points as a .shp and ground-truthed against a range of sources, including Google Earth, Planet and RapidEye data for the 2016 year (which had the most data available). The reference points may be exported for ground-truthing using google drive, as in the code snippet below.
+
+```javascript
 Export.table.toDrive({
 	collection: aaPoints, 
 	description:'aa_points', 
