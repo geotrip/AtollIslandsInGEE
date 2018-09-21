@@ -107,7 +107,7 @@ function fmask(image) {
   return image.updateMask(image.select('fmask').lte(1));
 }
 ```
-Here cloud-masking is implemented as a function, and needs to be called on the image collection in order to work. To do this for every single scene in the image collection, it needs to be [mapped](https://developers.google.com/earth-engine/ic_mapping) using the .map() function. The code below applies the BQA function to the ls8t2col collection. As we will no longer need the BQA band after the cloud filtering has been completed, this is a good time to eliminate bands you will not use. This can be done using the .select() function with a list of bands you want to keep, e.g. 'B1','B2','B3','B8'. Since the bands I wanted to keep are contiguous, I used the shorthand 'B[2-8]'.
+Here cloud-masking is implemented as a function, and needs to be called on the image collection in order to work. To do this for every single scene in the image collection, it needs to be [mapped](https://developers.google.com/earth-engine/ic_mapping) using the *map()* function. The code below applies the BQA function to the ls8t2col collection. As we will no longer need the BQA band after the cloud filtering has been completed, this is a good time to eliminate bands you will not use. This can be done using the *select()* function with a list of bands you want to keep, e.g. 'B1','B2','B3','B8'. Since the bands I wanted to keep are contiguous, I used the shorthand 'B[2-8]'.
 
 ```javascript
 var t2Filt = ls8t2col
@@ -115,7 +115,7 @@ var t2Filt = ls8t2col
   .select('B[2-8]');
 ```
 
-Now that we have removed the cloudy pixels from each image in the collection, we can produce a composite image. To do this, the image collection needs to be converted into a single image. In GEE, going from multiple (an image collection) to single (a single composite) is achieved using a [reducer](https://developers.google.com/earth-engine/reducers_intro). There are reducers available for most aggregating statistics, such as mean, median, mode, min, max, standard deviation etc. I found median to provide the best results, with mean being more influenced by the extremes in pixel values contributed by cloud and cloud shadow that persisted through the masking process. Note that the composite is also clipped by the calling the .clip() method with the roi object used as the input geometry. This makes the output much easier to analyse, but does not speed up reduction process. Again, you can also clip images using a geometry drawn within GEE.
+Now that we have removed the cloudy pixels from each image in the collection, we can produce a composite image. To do this, the image collection needs to be converted into a single image. In GEE, going from multiple (an image collection) to single (a single composite) is achieved using a [reducer](https://developers.google.com/earth-engine/reducers_intro). There are reducers available for most aggregating statistics, such as mean, median, mode, min, max, standard deviation etc. I found median to provide the best results, with mean being more influenced by the extremes in pixel values contributed by cloud and cloud shadow that persisted through the masking process. Note that the composite is also clipped by the calling the *clip()* method with the roi object used as the input geometry. This makes the output much easier to analyse, but does not speed up reduction process. Again, you can also clip images using a geometry drawn within GEE.
 
 ```javascript
 var t2median = t2Filt
@@ -125,13 +125,13 @@ var t2median = t2Filt
 
 
 ### Visualising results
-To visualise the result, we need to add the composite to the map as a layer. This is done using the Map.addLayer() function. This function takes an image, an object containing visualization parameters (such as which bands to use, gamma and stretch etc.) and optionally a label and a flag to automatically turn the layer on or off (this can be useful if you have many layers, but only want GEE to process the one you are interested in at the time). 
+To visualise the result, we need to add the composite to the map as a layer. This is done using the *Map.addLayer()* function. This function takes an image, an object containing visualization parameters (such as which bands to use, gamma and stretch etc.) and optionally a label and a flag to automatically turn the layer on or off (this can be useful if you have many layers, but only want GEE to process the one you are interested in at the time). 
 
 ```javascript
 Map.addLayer(t2median, ls8viz, '{bands: 'B4,B3,B2', gamma: 2}', true);
 ```
 
-If you are visualising a number of similar images, it can be cleaner to create a visualization parameter object and calling it for all instances, rather than repeating it for each Map.addLayer() call, as below.
+If you are visualising a number of similar images, it can be cleaner to create a visualization parameter object and calling it for all instances, rather than repeating it for each *Map.addLayer()* call, as below.
 
 ```javascript
 var ls8viz = {bands: 'B4,B3,B2', gamma: 2};
@@ -172,7 +172,7 @@ var final = (medT1.unmask().add(filler.unmask())).clip(roi)
 ```
 
 ### A quick note on built-in GEE Landsat algorithims
-GEE has a number of built-in algorithms specific to particular sensors, including Landsat. These include simpleCloudScore (ee.Algorithms.Landsat.simpleCloudScore()), simpleComposite (ee.Algorithms.Landsat.simpleComposite()) and methods for TOA or SR conversion. These require raw Landsat data, rather than the TOA used here. The simpleCompostie algorithm works very well, and can be used to quickly produce composites of large areas. However, the cloud-masking approach it employs struggles with the bright coral sands found within atoll environments and as such can produce notably inferior results to the (much more involved) workflow outlined above. Outside of these locations it works very well. [This script](https://code.earthengine.google.com/6cec9db5f8b866afb64cdc7e3f752c76) shows how simpleComposite works and gives and example generated from six months of Landsat 8 T1 scenes. 
+GEE has a number of built-in algorithms specific to particular sensors, including Landsat. These include simpleCloudScore (*ee.Algorithms.Landsat.simpleCloudScore()*), simpleComposite (*ee.Algorithms.Landsat.simpleComposite()*) and methods for TOA or SR conversion. These require raw Landsat data, rather than the TOA used here. The simpleCompostie algorithm works very well, and can be used to quickly produce composites of large areas. However, the cloud-masking approach it employs struggles with the bright coral sands found within atoll environments and as such can produce notably inferior results to the (much more involved) workflow outlined above. Outside of these locations it works very well. [This script](https://code.earthengine.google.com/6cec9db5f8b866afb64cdc7e3f752c76) shows how simpleComposite works and gives and example generated from six months of Landsat 8 T1 scenes. 
 
 ### Pan-sharpening
 Now that a final composite has been produced, any additional transformations can be undertaken such as pan-sharpening and band ratioing. [Pan-sharpening](https://developers.google.com/earth-engine/image_transforms) is easy to achieve, but make sure that the resulting sharpened image is exported at the resolution of the pan rather than multispectral bands. 
@@ -216,7 +216,7 @@ Using the [normalised difference spectral vector (NDSV) approach](https://ieeexp
 ![NDSV](Images/NDr10.png "R10 NDSV")
 
 
-Note the implementation below renames the Landsat 8 bands to make blue B1, rather than coastal-aerosol. The Landsat 7 implementation also renames the bands, allowing the NDSV images produced using both sensors to be directly compared. Bands may be renamed using the .select() function: two lists of the same length are required as an argument, the first containing the bands you wish to select and the second the new band labels (in order). 
+Note the implementation below renames the Landsat 8 bands to make blue B1, rather than coastal-aerosol. The Landsat 7 implementation also renames the bands, allowing the NDSV images produced using both sensors to be directly compared. Bands may be renamed using the *select()* function: two lists of the same length are required as an argument, the first containing the bands you wish to select and the second the new band labels (in order). 
 
 ```javascript
 var toNDSVLS8 = function(image){
@@ -270,7 +270,7 @@ return ndsv.clip(roi)
 };
 ```
 
-Also note that both the Landsat 8 and Landsat 7 NDSV code snippets are functions, and thus must be called on the image object (which contains the required bands) to produce an NDSV image. As this is generally done after your image collection has been reduced to a single image (i.e. your final composite) you do not need to use .map() (though you could if you wanted to apply NDSV to every image in a collection). Instead, it is simply called like so:
+Also note that both the Landsat 8 and Landsat 7 NDSV code snippets are functions, and thus must be called on the image object (which contains the required bands) to produce an NDSV image. As this is generally done after your image collection has been reduced to a single image (i.e. your final composite) you do not need to use *map()* (though you could if you wanted to apply NDSV to every image in a collection). Instead, it is simply called like so:
 
 ```javascript
 var nd = toNDSVLS7(image)
@@ -280,7 +280,7 @@ var nd = toNDSVLS7(image)
 
 Depending on the size of your study area and the number of scenes being reduced, it make take some considerable time for GEE to process the final composite. You may also notice that the composite takes a while to reload when the zoom level is changed - this is because GEE processes at the scale set by the zoom level - esentially a level in the [pyramid](https://developers.google.com/earth-engine/scale) approach common to many GIS platforms.
 
-Any subsequent calculations that rely on the final composite will also be slow, since it will need to be computed beforehand. Some more complex calculations, such as classification, may not work at all, timing out or running over the GEE user memory limit. This issue becomes magnified when trying to deal with multiple composites covering different date ranges - clearly processing multiple composites within the same script would be difficult and highly inefficient. To address this issue, images and features that are created within GEE scripts may be exported as a GEE [asset](https://developers.google.com/earth-engine/exporting). After export, assets may be imported into a script from the assets tab (on the left of the window by default). Imported assets perform much better in complex calculations, as less processing needs to be done 'on the fly'. Both images and features may also be exported to the drive of the google account associated with GEE, allowing data produced in GEE to be used outside of it in the traditional matter. The following code snippet shows how the final composite (finalComp) is exported as a GEE asset. There are a few things to note here: the Export.image.toAsset() function takes a number of arguments, but not all are required, and some (such as scale) make others redundant. In cases like these, it can be easier to use curly brackets { } within the function brackets ( ). This allows the arguments to be specifically called by name and followed by : before answering the argument as normal. This can also make it clearer what each argument in a complex function is doing, improving readability.
+Any subsequent calculations that rely on the final composite will also be slow, since it will need to be computed beforehand. Some more complex calculations, such as classification, may not work at all, timing out or running over the GEE user memory limit. This issue becomes magnified when trying to deal with multiple composites covering different date ranges - clearly processing multiple composites within the same script would be difficult and highly inefficient. To address this issue, images and features that are created within GEE scripts may be exported as a GEE [asset](https://developers.google.com/earth-engine/exporting). After export, assets may be imported into a script from the assets tab (on the left of the window by default). Imported assets perform much better in complex calculations, as less processing needs to be done 'on the fly'. Both images and features may also be exported to the drive of the google account associated with GEE, allowing data produced in GEE to be used outside of it in the traditional matter. The following code snippet shows how the final composite (finalComp) is exported as a GEE asset. There are a few things to note here: the *Export.image.toAsset()* function takes a number of arguments, but not all are required, and some (such as scale) make others redundant. In cases like these, it can be easier to use curly brackets { } within the function brackets ( ). This allows the arguments to be specifically called by name and followed by : before answering the argument as normal. This can also make it clearer what each argument in a complex function is doing, improving readability.
 
 ```javascript
 Export.image.toAsset({
@@ -294,7 +294,7 @@ Export.image.toAsset({
 
 A couple of these arguments warrant further discussion. The description and assetId arguments are strings (i.e. text), but you can concatenate variable values onto text using +. In this example the variables **place** and **year** are concatenated to save having to rewrite each when the area or timespan of the composite being generated is changed (these variables are defined at the top of the code, and the year variable was also used to define the time range during the temporal filtering of the image collection). 
 
-The region is the geometry of the area you wish to export. Note that this needs to be a single polygon. If you use a multipolygon, the export will fail. An easy way to get around this issue is to either draw a polygon within GEE, or (as above) call the .geometry() and .bounds() methods (in that order) on an existing feature such as an roi polygon. The .geometry() function creates a geometry object from the feature coordinates, and .bounds() creates a single bounding box that contains all of the polygons that the feature may be comprised of. Note that if you do not specify this, it will default to the area of your map view at the time when the function is called (this can be useful when making figures).
+The region is the geometry of the area you wish to export. Note that this needs to be a single polygon. If you use a multipolygon, the export will fail. An easy way to get around this issue is to either draw a polygon within GEE, or (as above) call the *geometry()* and *bounds()* methods (in that order) on an existing feature such as an roi polygon. The *geometry()* function creates a geometry object from the feature coordinates, and *bounds()* creates a single bounding box that contains all of the polygons that the feature may be comprised of. Note that if you do not specify this, it will default to the area of your map view at the time when the function is called (this can be useful when making figures).
 
 The scale argument controls the resolution at which your asset will be exported at. This is important to specify, as by default it is set to 1000 m. In most cases this will be the native resolution of your imagery (in this case the multispectral bands of Landsat 8, which are 30 m. If pan-sharpened imagery was being exported instead, this should be set to 15 m). Note that higher resolutions will take up more of your 250 GB asset allowance for the same geographic area. Also note that going beyond the native resolution of your imagery is pointless (i.e. exporting Landsat 8 data at 1 m resolution).
 
@@ -306,7 +306,7 @@ need to specify a higher limit using maxPixels. The current upper limit is 1e13.
 
 Now that the composite imagery has been generated and saved as assets, they can be classified. Classification involves using a special algorithm (a classifier) to determine which of a user defined group of classes each pixel is most likely to represent. In this case, decisions are based upon the spectral values of each pixel (per band) after the classifier has been trained using a labelled dataset of representative pixels. For more information on classification within GEE, see this [GEE Classification video tutorial](https://developers.google.com/earth-engine/tutorials#classification). For the purposes of this tutorial, a single date classification (training data sampled from one image) will be prepared initially, then multi-date classification will be discussed.  
 
-For ease of use, I created a new script for classification, keeping it seperate from the code which produces the composites detailed above. To begin, in a new script I defined the variable **toClassify** with the composite image and clipped it to the roi (the same as the previous script). Note that clipping does not carry over in exported assets: the area clipped out when generating the composite will be all black (i.e. null), but for visualistion purposes it is best to clip this off by clipping the image again. This code also adds the image to be classified to the map view (Map.addLayer(...)).
+For ease of use, I created a new script for classification, keeping it seperate from the code which produces the composites detailed above. To begin, in a new script the previously generated composite NDSV image was defined as the variable **toClassify** and clipped to the roi (the same as the previous script). Note that clipping does not carry over in exported assets: the area clipped out when generating the composite will be all black (i.e. null), but for visualistion purposes it is best to clip this off by clipping the image again. This code also adds the image to be classified to the map view (Map.addLayer(...)).
 
 ```javascript
 var toClassify = n17
@@ -324,10 +324,10 @@ Training samples generally take the form of polygonal geometries within which pi
 
 ### Sampling the image
 
-Now that the training samples and the image to be sampled from are both present, a training dataset can be built. This is done using the .sampleRegions() function, which is called on the image from which the training data is to be generated. In the code below, my NDSV composite **NDmedian** is being sampled. The .sampleRegions() function has a number of arguments which need to be answered: the collection is the training sample polygons (with a class property) that you are using. In the example below the collection is the merged feature collections for each class (i.e Wt for water, Vg for vegetated etc.) You may also produce this collection of training samples as as a distinct variable prior to using this function instead. The properities argument defines which properties of your training feature collection to copy: in this case, the class property is required. Finally, scale, projection and tilescale are optional arguments (scale defaults to the resolution of the first band of the input image, while tileScale can be useful when undertaking very large number of samples).
+Now that the training samples and the image to be sampled from are both present, a training dataset can be built. This is done using the *sampleRegions()* function, which is called on the image from which the training data is to be generated. In the code below, my NDSV composite, loaded into the variable **toClassify**, is being sampled. The *sampleRegions()* function has a number of arguments which need to be answered: the collection is the training sample polygons (with a class property) that you are using. In the example below the collection is the merged feature collections for each class (i.e Wt for water, Vg for vegetated etc.) You may also produce this collection of training samples as as a distinct variable prior to using this function instead. The properities argument defines which properties of your training feature collection to copy: in this case, the class property is required. Finally, scale, projection and tilescale are optional arguments (scale defaults to the resolution of the first band of the input image, while tileScale can be useful when undertaking very large number of samples).
 
 ```javascript
-var training = NDmedian.sampleRegions({
+var training = toClassify.sampleRegions({
 	collection: Wt.merge(Sh).merge(Vg).merge(Urb),
 	properties: ['class'],
 });
@@ -343,7 +343,7 @@ Now that a training dataset has been prepared, it is time to choose a classifer 
 var classifier = ee.Classifier.svm();
 ```
 
-To train the selected classifier, call the .train() function on it. The required arguments are the input training features (the training data generated by the code snippet above), the class property (whatever property contains the class code) and the input properties (in this case the bands of the NDSV image being classified).
+To train the selected classifier, call the *train()* function on it. The required arguments are the input training features (the training data generated by the code snippet above), the class property (whatever property contains the class code) and the input properties (in this case the bands of the NDSV image being classified).
 
 ```javascript
 // Train the chosen classifier 
@@ -354,7 +354,7 @@ var fullClassifier = classifier.train({
   'R8', 'R9', 'R10', 'R11', 'R12', 'R13', 'R14', 'R15']
 });
 ```
-With the classifier trained, it is simply a case of calling the .classify() function on the image to be classifed, using the trained classifier object as the argument.
+With the classifier trained, it is simply a case of calling the *classify()* function on the image to be classifed, using the trained classifier object as the argument.
 
 ```javascript
 // Classify the images.
@@ -363,7 +363,7 @@ var classified = toClassify.classify(fullClassifier);
 
 ### Visualising the classification
 
-Now the classification needs to be visualised. This is a bit different to visualising a normal image, as the pixel values now describe a class rather than the brightness (reflectance) within a given spectral window (band). Thus we need to assign a colour to each class, making it easy to understand which class pixels have been allocated to. GEE provides the palette object to achieve this. Palettes can only be used on an image with a single band, and can be used as a ramp (such as for a DEM etc.) or categorically (as here). The palette is a list of colours which is called as part of the visualiation parameters used with the Map.addLayer() function. These colours need to be [CSS style](https://en.wikipedia.org/wiki/X11_color_names) strings (names or hex). For more information on palettes, check the [GEE guide](https://developers.google.com/earth-engine/image_visualization).
+Now the classification needs to be visualised. This is a bit different to visualising a normal image, as the pixel values now describe a class rather than the brightness (reflectance) within a given spectral window (band). Thus we need to assign a colour to each class, making it easy to understand which class pixels have been allocated to. GEE provides the palette object to achieve this. Palettes can only be used on an image with a single band, and can be used as a ramp (such as for a DEM etc.) or categorically (as here). The palette is a list of colours which is called as part of the visualiation parameters used with the *Map.addLayer()* function. These colours need to be [CSS style](https://en.wikipedia.org/wiki/X11_color_names) strings (names or hex). For more information on palettes, check the [GEE guide](https://developers.google.com/earth-engine/image_visualization).
 
 ```javascript
 var palette = ['LIGHTSKYBLUE', 'DARKGREEN', 'LEMONCHIFFON','ORANGE'];
@@ -408,7 +408,7 @@ Note that while it would be possible to use the training samples that were alrea
 
 ### Generating reference points
 
-GEE has a built in function for stratified random sampling, making it very easy to achieve. This function (.stratifiedSample()) takes the number of points (note this is per class, not in total), the band containing the classification, the region to sample in, wether to ignore masked pixels (dropNulls) and wether to include a geometry with each sample (so each sample has a point geometry). The function is called on the classified image, as in the code snippet below.
+GEE has a built in function for stratified random sampling, making it very easy to achieve. This function (*stratifiedSample()*) takes the number of points (note this is per class, not in total), the band containing the classification, the region to sample in, wether to ignore masked pixels (dropNulls) and wether to include a geometry with each sample (so each sample has a point geometry). The function is called on the classified image, as in the code snippet below.
 
 ```javascript
 // Create AA points
@@ -432,7 +432,7 @@ Export.table.toDrive({
 
 Once the points have been ground truthed, they can be uploaded back into GEE. From the Assets tab, click New, then Table upload. Click select, then naviagate to the folder where your data is located and select it (making sure to include the required metadata files in the case of a .shp). Name the file, click ok and it will be 'ingested', becoming avaialbe within your GEE assets.
 
-Once ingested, this data can be used to determince the accuracy of your classification. To do this, use the sampleRegions function again, this time using the reference points (here **fsm_aa**) instead of training samples. These samples are then classifed by the same classifier to produce a validation dataset, which contains two properites, one with the reference ('true') class (here **'classifica'**) and the class alaocated by the classifier (**'classification'**). The two are compared using the errorMatrix() function, as in the code snippet below.
+Once ingested, this data can be used to determince the accuracy of your classification. To do this, use the sampleRegions function again, this time using the reference points (here **fsm_aa**) instead of training samples. These samples are then classifed by the same classifier to produce a validation dataset, which contains two properites, one with the reference ('true') class (here **'classifica'**) and the class alaocated by the classifier (**'classification'**). The two are compared using the *errorMatrix()* function, as in the code snippet below.
 
 ```javascript
 // Test the classifiers' accuracy
@@ -449,7 +449,7 @@ var errorMatrix = validation.errorMatrix('classifica','classification');
 
 ```
 
-Now that the errorMatrix object has been generated, it may be printed to the console. Other accuracy metrics may also be printed by calling additional functions such as .accuracy() and .producersAccuracy() on the matrix object.
+Now that the errorMatrix object has been generated, it may be printed to the console. Other accuracy metrics may also be printed by calling additional functions such as accuracy() and producersAccuracy() on the matrix object.
 
 ```javascript
 print('Confusion table:', errorMatrix);
