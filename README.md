@@ -387,13 +387,17 @@ For the results of any classification to be useful, the accuracy must be quantif
 
 For the accuracy values to be meaningful, a number of factors must be considered: 
 
-- how should the points be distributed (what sampling stratergy should be implemented)?
+- how should the points be distributed (what sampling technique should be implemented)?
 - how many accuracy assessment/reference points are required (what is the required sample size)?
 - what reference material should be used to determine ground truth?
 
 There are numerous stratergies for how to select reference points: purely random, systematic (i.e. regular), clustered etc. While a purely random distribution within the target area may be the most 'scientific', the nature of atoll island enviroments (large amounts of water relative to small clusters of land) means that this stratergy isn't workable. This problem is illustrated in the image below: of the 40 random points distributed within the ROI polygon, only 1 or 2 were not pixels classified as water (the island at the top left, the only land area of the atoll, had no reference points at all). Therfore, any miss-classification of non-water classes that did occur would not be reflected in the accuracy results. Given the stated aim of measuring land area change, random sampling (or using a regular grid) is clearly unworkable.
 
 ![rand image](Images/rand.png "Randomly distributed reference points")
+
+Accordingly, a thematically stratified random sampling technique is the best option. Equal numbers of reference points are randomly distributed within the area allocated to each class of a classified image. This maintains the statistical robustness of random sampling while ensuring that minority classes (i.e. land) are also properly represented.
+
+
 
 Determining the number of reference points (sample size) is a balance between ensuring a representative sample with the substantial time investment that truthing points against reference data requires. Generally more than 50 points per class are recomended, increasing to 75 - 100 for larger areas (> 400 km<sup>2</sup>) or large numbers of classes (i.e. >12) ([Congalton, 1991](https://www.sciencedirect.com/science/article/pii/003442579190048B)). Much more material on this issue is available, including emperical equations for determining sample size. 
 
