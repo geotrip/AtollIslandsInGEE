@@ -396,9 +396,9 @@ There are numerous stratergies for how to select reference points: purely random
 
 ![rand image](Images/rand.png "Randomly distributed reference points")
 
-Accordingly, a thematically stratified random sampling technique is the best option. Equal numbers of reference points are randomly distributed within the area allocated to each class of a classified image. This maintains the statistical robustness of random sampling while ensuring that minority classes (i.e. land) are also properly represented.
+Accordingly, a thematically stratified random sampling technique is the best option, as shown in the image below. Equal numbers of reference points are randomly distributed within the area allocated to each class of a classified image. This maintains the statistical robustness of random sampling while ensuring that minority classes (i.e. land) are also properly represented.
 
-![strat rand image](Images/strat_rand.png "Thematically stratified randomly distributed reference points")
+![strat rand image](Images/strat_rand2.png "Thematically stratified randomly distributed reference points")
 
 ### Sample size
 
