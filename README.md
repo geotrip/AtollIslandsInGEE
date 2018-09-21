@@ -391,7 +391,7 @@ For the accuracy values to be meaningful, a number of factors must be considered
 - how many accuracy assessment/reference points are required (what is the required sample size)?
 - what reference material should be used to determine ground truth?
 
-There are numerous stratergies for how to select reference points: purely random, systematic (i.e. regular), clustered etc. While a purely random distribution within the target area may be the most 'scientific', the nature of atoll island enviroments means that this stratergy isn't workable. 
+There are numerous stratergies for how to select reference points: purely random, systematic (i.e. regular), clustered etc. While a purely random distribution within the target area may be the most 'scientific', the nature of atoll island enviroments (large amounts of water relative to small clusters of land) means that this stratergy isn't workable. This problem is illustrated in the image below: of the 40 random points distributed within the ROI polygon, only 1 or 2 were not pixels classified as water (the island at the top left, the only land area of the atoll, had no reference points at all). Therfore, any miss-classification of non-water classes that did occur would not be reflected in the accuracy results. Given the stated aim of measuring land area change, random sampling (or using a regular grid) is clearly unworkable.
 
 ![rand image](Images/rand.png "Randomly distributed reference points")
 
