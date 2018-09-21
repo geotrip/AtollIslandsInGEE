@@ -480,7 +480,9 @@ A common practice within classification workflows is post-classification filteri
 
 While the cloud-filtering prior to classification is reasonably effective, it is likely that some cloud artefacts persisted into the final composite and were classified (particularly if there was limited image availability for the given location). Generally, cloudy pixels were located over water and classified as land. Therefore, an approach was required that removed missclassified cloudy pixels while leaving pixels correctly classified as land classes alone. 
 
-Taking advantage of the fact that the same area was classified multiple times for different years, adding all the images together allowed a total pixel value to be calculated. Because water had been given the class code 0, pixels which were consistantly water through time still had a value when added togther. If the total image pixel was 4 (which represents urban), then it had been classified as urban in one of the classifications, and water in all the others and was highly likely to be cloud. To make sure that confusion cannot occur (e.g. 3 * 1 also = 3) the class codes were remapped using the *remap* function, which takes two lists, the original codes and the replacement codes, as seen in the code snippet below. The *unmask* method is used because if a pixel is masked in any of the classifications being summed, the total result image will also have that pixel masked. 
+### Creating a summed image
+
+Taking advantage of the fact that the same area was classified multiple times for different years, adding all the images together allowed a total pixel value to be calculated. Because water had been given the class code 0, pixels which were consistantly water through time still had a value when added togther. If the total image pixel was 4 (which represents urban), then it had been classified as urban in one of the classifications, and water in all the others and was highly likely to be cloud (this should not effect actual island growth or construction, as the islands are located on reefs, so the sum of a pixel which has gone from reef to land will be higher). To make sure that confusion cannot occur (e.g. 3 * 1 also = 3) the class codes were remapped using the *remap* function, which takes two lists, the original codes and the replacement codes, as seen in the code snippet below. The *unmask* method is used because if a pixel is masked in any of the classifications being summed, the total result image will also have that pixel masked. 
 
 ```javascript
 //Add all the images together 
@@ -496,10 +498,14 @@ s9901.unmask().remap([0,1,3,4],[0,10,3,4])
 .add(s17.unmask().remap([0,1,3,4],[0,10,3,4]));
 ```
 
-```javascript
-var waterMiss = total.eq(4).or(total.eq(3))
-var cleaned = toProcess.multiply(waterMiss.subtract(1)).multiply(-1)
+By taking the pixels which have been marked as land only once for the class to which cloudy pixels are allocated (in this case urban), a mask may be produced. 
 
+```javascript
+var waterMiss = total.eq(4)
+var cleaned = toProcess.multiply(waterMiss.subtract(1)).multiply(-1)
+```
+
+```javascript
 cleaned = cleaned.clip(roi)//.geometry().difference(cloud0203));
 cleaned = cleaned.mask(s16.neq(99))
 ```
