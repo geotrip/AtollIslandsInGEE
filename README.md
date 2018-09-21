@@ -476,9 +476,33 @@ Export.image.toAsset({
 <a name="filt"></a>
 ## Post classification filtering
 
-A common practice within classification workflows is post-classification filtering, where the raw classifications are processed to (hopefully) remove the so called 'speckle' (aka 'salt and pepper') effect, where there are numerous single pixels classed as something different to their neighbour. Generally this issue is addressed through the use of a generalising, window based function such as majority filtering, sieving etc. GEE supports focal based [morphological operations](https://developers.google.com/earth-engine/image_morph) to achieve this. 
+A common practice within classification workflows is post-classification filtering, where the raw classifications are processed to (hopefully) remove the so called 'speckle' (aka 'salt and pepper') effect, where there are numerous single pixels classed as something different to their neighbour. Generally this issue is addressed through the use of a generalising, window based function such as majority filtering, sieving etc. GEE supports focal based [morphological operations](https://developers.google.com/earth-engine/image_morph) to achieve this. However, this approach is not appropriate in this context as the minority landcovers (i.e. land classes) are the target: applying a traditional filter like those listed above will likely erase smaller island features from the classification, given they are often comprismed of only a small number of pixels and surounded by far more prevelant classes such as reef or water.
 
-While the cloud-filtering prior to classification is reasonably effective, it is likely that some cloud artefacts persisted into the final composite and were classified (particularly if there was limited image availability for the given location).
+While the cloud-filtering prior to classification is reasonably effective, it is likely that some cloud artefacts persisted into the final composite and were classified (particularly if there was limited image availability for the given location). Generally, cloudy pixels were located over water and classified as land. Therefore, an approach was required that removed missclassified cloudy pixels while leaving pixels correctly classified as land classes alone. 
+
+Taking advantage of the fact that the same area was classified multiple times for different years, adding all the images together allowed a total pixel value to be calculated. Because water had been given the class code 0, pixels which were consistantly water through time still had a value when added togther. If the total image pixel was 4 (which represents urban), then it had been classified as urban in one of the classifications, and water in all the others and was highly likely to be cloud. To make sure that confusion cannot occur (e.g. 3 * 1 also = 3) the class codes were remapped using the *remap* function, which takes two lists, the original codes and the replacement codes, as seen in the code snippet below. The *unmask* method is used because if a pixel is masked in any of the classifications being summed, the total result image will also have that pixel masked. 
+
+```javascript
+//Add all the images together 
+var total = 
+s9901.unmask().remap([0,1,3,4],[0,10,3,4])
+.add(s0203.unmask().remap([0,1,3,4],[0,10,3,4]))
+.add(s0406.unmask().remap([0,1,3,4],[0,10,3,4]))
+.add(s0710.unmask().remap([0,1,3,4],[0,10,3,4]))
+.add(s1113.unmask().remap([0,1,3,4],[0,10,3,4]))
+.add(s14.unmask().remap([0,1,3,4],[0,10,3,4]))
+.add(s15.unmask().remap([0,1,3,4],[0,10,3,4]))
+.add(s16.unmask().remap([0,1,3,4],[0,10,3,4]))
+.add(s17.unmask().remap([0,1,3,4],[0,10,3,4]));
+```
+
+```javascript
+var waterMiss = total.eq(4).or(total.eq(3))
+var cleaned = toProcess.multiply(waterMiss.subtract(1)).multiply(-1)
+
+cleaned = cleaned.clip(roi)//.geometry().difference(cloud0203));
+cleaned = cleaned.mask(s16.neq(99))
+```
 
 <a name="area"></a>
 ## Deriving area measurements
