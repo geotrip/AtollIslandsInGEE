@@ -448,7 +448,7 @@ var validation = testing.classify(fullClassifier);
 var errorMatrix = validation.errorMatrix('classifica','classification');
 ```
 
-Now that the errorMatrix object has been generated, it may be printed to the console. Other accuracy metrics may also be printed by calling additional functions such as *accuracy()* and *producersAccuracy()* on the matrix object. This information can be copied from the console for use elsewhere.
+Now that the errorMatrix object has been generated, it may be printed to the console. The error matrix (aka confusion matrix) is useful for understanding the relative accuracy of the different classes, or how confusion may be occuring. Other accuracy metrics may also be printed by calling additional functions such as *accuracy()* and *producersAccuracy()* on the matrix object. This information can be copied from the console for use elsewhere.
 
 ```javascript
 print('Confusion table:', errorMatrix);
