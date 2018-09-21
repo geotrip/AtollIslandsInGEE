@@ -430,8 +430,7 @@ Export.table.toDrive({
 	fileFormat :'SHP'})
 ```
 
-Export to drive
-check against hi-res reference material
+Once the points have been ground truthed, they can be uploaded back into GEE. From the Assets tab, click New, then Table upload. Click select, then naviagate to the folder where your data is located and select it (making sure to include the required metadata files in the case of a .shp). Name the file, click ok and it will be 'ingested', becoming avaialbe within your GEE assets.
 
 ```javascript
 /* Test the classifiers' accuracy. (data, y, x), this can be done with training samples or 
