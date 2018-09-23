@@ -539,45 +539,13 @@ Export.image.toAsset({
 The final step is to generate useful area values from the computed classifications. This requires that the pixels which make up the classification be converted to area - GEE provides *ee.Image.pixelArea()* for this purpose.
 
 ```Javascript
-s9902 = s9902.clip(roi.geometry().difference(cld9902)).mask(c16.neq(99))
-// r0203 = r0203.mask(r17.neq(99))
-// r0406 = r0406.mask(r17.neq(99))
-// r0708 = r0708.mask(r17.neq(99))
-// r0911 = r0911.mask(r17.neq(99))
-// r1213 = r1213.mask(r17.neq(99))
-s14 = s14.clip(roi.geometry().difference(cld14)).mask(c16.neq(99))
-s17 = s17.clip(roi.geometry().difference(cld17)).mask(c16.neq(99))
-
-roi = roi.filter(ee.Filter.eq('Id',7));
-var roiClippedIn = roi.geometry().difference(exclude)
-
-//Have to clip the classified images seperately
-s9902 = s9902.clip(roiClippedIn)
-s0308 = s0308.clip(roiClippedIn)
-s0913 = s0913.clip(roiClippedIn)
-s14 = s14.clip(roiClippedIn)
-s15 = s15.clip(roiClippedIn)
-s16 = s16.clip(roiClippedIn)
-s17 = s17.clip(roiClippedIn)
-
+// Filter to a particular atoll
+roi = roi.filter(ee.Filter.eq('Id',2));
 Map.addLayer(roi,{},'ROI')
 Map.centerObject(roi)
-//need to update with joined training sample results
-// s0708 = s0708.clip(roi.geometry().difference(wrg07))
-// s0911 = s0911.clip(roi.geometry().difference(wrg10))
-//Map.centerObject(roi)
+print(roi)
 
-
-// //change matrix
-// var diff = s9901.remap([0,1,2,3,4],[0,1,10,100,1000]).subtract(s17.remap([0,1,2,3,4],[0,1,10,100,1000]))
-// //Map.addLayer(diff,{min: -100, max: 90},'change')
-// var reclaimed = diff.eq(99).or(diff.eq(90)).or(diff.eq(-900))
-// //var reclaimed = diff.eq(90).or(diff.eq(99)).or(diff.eq(-900))//.or(diff.eq(-10)).or(diff.eq(-1000)).or(diff.eq(-1))
-// reclaimed = reclaimed.mask(reclaimed)
-
-// var areaImageSqM = ee.Image.pixelArea().clip(roi);
-
-
+// Function to generate per-class area values
 var defineArea = function(image){
   var areaImageSqM = ee.Image.pixelArea()
     .clip(roi);
@@ -613,13 +581,11 @@ var sepArea = function(image,id){
     return ee.Dictionary([(''+i), (ee.Number(area.get('classification')).divide(1e6))]);
 }; 
 
-
-
-var year = '20092013'
+var year = '2017'
 print(roi.size())
 var result = ee.Dictionary();
-for(var i = 0; i < 41; i++) {
-  result = result.combine(sepArea(s0913,i))
+for(var i = 0; i <= 7; i++) {
+  result = result.combine(sepArea(s17,i))
 }
 print(result)
 
@@ -631,73 +597,9 @@ Export.table.toDrive({
 });
 
 
-
-
 var palette = ['LIGHTSKYBLUE', 'DARKGREEN',  'SILVER', 'LEMONCHIFFON','ORANGE','BROWN'];
 
 
 
-Map.addLayer(s9902,{min: 0, max: 5, palette: palette},'1999 to 2002 Classified');
-Map.addLayer(s0308,{min: 0, max: 5, palette: palette},'2003 to 2008 Classified');
-Map.addLayer(s0913,{min: 0, max: 5, palette: palette},'2009 to 2013 Classified');
-
-Map.addLayer(s14,{min: 0, max: 5, palette: palette},'2014 Classified');
-Map.addLayer(s15,{min: 0, max: 5, palette: palette},'2015 Classified');
-Map.addLayer(s16,{min: 0, max: 5, palette: palette},'2016 Classified');
-Map.addLayer(s17,{min: 0, max: 5, palette: palette},'2017 Classified');
-
-Map.addLayer(m9902.clip(roi),{gamma: 2, bands: 'B3,B2,B1'},'9901');
-Map.addLayer(m0308.clip(roi),{gamma: 2, bands: 'B3,B2,B1'},'0203');
-Map.addLayer(m0913.clip(roi),{gamma: 2, bands: 'B3,B2,B1'},'0913');
-
-Map.addLayer(ps14.clip(roi),{gamma: 2.2},'2014 PS');
-Map.addLayer(ps15.clip(roi),{gamma: 2.2},'2015 PS');
-Map.addLayer(ps16.clip(roi),{gamma: 2.2},'2016 PS');
-Map.addLayer(ps17.clip(roi),{gamma: 2.2},'2017 PS');
-
-
-// Map.addLayer(reclaimed.clip(roi),{palette: ['red']},'reclaimed')
-
-
-//LS7
-var area9902 = defineArea(s9902);
-var area0308 = defineArea(s0308);
-var area0913 = defineArea(s0913);
-
-//LS8
-var area14 = defineArea(s14);
-var area15 = defineArea(s15);
-var area16 = defineArea(s16);
-var area17 = defineArea(s17);
-
-var vegGraph = [area9902.get('1'), area0308.get('1'), area0913.get('1'), area14.get('1'), area15.get('1'), area16.get('1'), area17.get('1')];
-// var unvegGraph = [area9901.get('2'), area0203.get('2'), area0406.get('2'), area0710.get('2'), area1113.get('2'), area14.get('2'), area15.get('2'), area16.get('2'), area17.get('2')];
-var urbanGraph = [area9902.get('4'), area0308.get('4'), area0913.get('4'), area14.get('4'), area15.get('4'), area16.get('4'), area17.get('4')];
-
-var totalGraph = [area9902.get('total_land'), area0308.get('total_land'), area0913.get('total_land'), 
-  area14.get('total_land'), area15.get('total_land'), 
-  area16.get('total_land'), area17.get('total_land')];
-print(totalGraph)
-//var totalGraph = [totalLandArea9901, totalLandArea0203, totalLandArea0406, totalLandArea0709, totalLandArea1013, totalLandArea14, totalLandArea15, totalLandArea16, totalLandArea17];
-
-//var xValues = ['2014','2015','2016','2017'];
-var xValues = [2000.5,2005.5,2011,2014,2015,2016,2017] //Works fine as strings
-var yValues = ee.Array.cat([vegGraph, urbanGraph, totalGraph], 1);
-print(yValues);
-var chart = ui.Chart.array.values(yValues, 0, xValues)
-    .setChartType('ScatterChart')
-    .setChartType('LineChart')//I don't know why it needed both to show lines rather than just points
-    .setSeriesNames(['Vegetated','Urban','Total Land'])
-    //.setSeriesNames(['Vegetated Land', 'Bare/Urban Land', 'Total Land'])
-    .setOptions({
-      title: 'Areal Trajectory',
-      hAxis: {'title': 'Year'},
-      vAxis: {'title': 'Area (km2)'},
-      pointSize: 3,
-      series: {
-            0: {color: 'DARKGREEN'}, // veg
-            1: {color: 'ORANGE'}, // Urban
-            2: {color: 'BLACK'}  // total    
-}});
 ```
 
