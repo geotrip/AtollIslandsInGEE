@@ -508,7 +508,7 @@ var waterMiss = total.eq(4)
 var cleaned = toProcess.multiply(waterMiss.subtract(1)).multiply(-1)
 ```
 
-Where this process does not remove cloud miss-classification, it may be removed manually using a geometry drawn within GEE, as in the code snippet below, where the roi geometry is differenced with a hand drawn polygon **cloud0203**. If this is not required, it may be commented out. Note that the final cleaned image is maksed using a composite with no gaps (in this case the 2016 composite **s16** - this fills in any gaps created by the last step with pixels equal to 0 (water) giving complete images, rather than having areas of masked pixels. 
+Where this process does not remove cloud miss-classification, it may be removed manually using a geometry drawn within GEE, as in the code snippet below, where the roi geometry is differenced with a hand drawn polygon **cloud0203**. If this is not required, it may be commented out. Note that the final cleaned image is masked using a composite with no gaps (in this case the 2016 composite **s16** - this fills in any gaps created by the last step with pixels equal to 0 (water) giving complete images, rather than having areas of masked pixels. 
 
 ```javascript
 cleaned = cleaned.clip(roi)//.geometry().difference(cloud0203));
@@ -536,5 +536,5 @@ Export.image.toAsset({
 <a name="area"></a>
 ## Deriving area measurements
 
-Now 
+The final step is to generate useful area values from the computed classifications. 
 
