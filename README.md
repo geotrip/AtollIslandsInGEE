@@ -70,7 +70,9 @@ print('C1 T2 size: ',ls8t2col.size());
 ### Cloud masking
 So now the ls8t2col variable contains all available scenes which were within the space and date range we specified. However, if we were to preform a reduction (combine all the scenes within the collection into one composite) the results would be very poor, like in the example below. 
 
-![Cloudy](Images/cloudy.PNG "Cloud contaminated composites")
+
+<img align="center" src="Images/cloudy.png" alt="Cloud contaminated composites">
+
 
 Anyone who has attempted passive satellite-based remote sensing in the tropics will have struck the same issue: clouds. Given the footprint of a single Landsat scene is some 185 by 180 km, at the latitudes in which coral reefs occur having a cloud free image is definitely the exception rather than the rule. Clouds are the enemy and would need to be removed before any approach to automate island detection could be successfully implemented within GEE.
 
@@ -214,7 +216,8 @@ var sharpened = toPS(image)
 ### NDSV
 Using the [normalised difference spectral vector (NDSV) approach](https://ieeexplore.ieee.org/document/6587128/) improved classification performance in this study. This involves producing a pseudo multispectral image from all possible unique band ratios. Here this includes all the 30 m resolution B, G, R, NIR, SWIR1 and SWIR2 bands, resulting in 15 band ratios. Band ratioing is a common practice within remote sensing, used to remove the radiometric influence of topography, or to provide a single value for quantitative analysis (e.g. NDVI). Below is a 1 band image of the 10th ratio, between B3 (red) and B4 (NIR).
 
-![NDSV](Images/NDr10.png "R10 NDSV")
+
+<img align="center" src="Images/NDr10.png" alt="R10 NDSV">
 
 
 Note the implementation below renames the Landsat 8 bands to make blue B1, rather than coastal-aerosol. The Landsat 7 implementation also renames the bands, allowing the NDSV images produced using both sensors to be directly compared. Bands may be renamed using the *select()* function: two lists of the same length are required as an argument, the first containing the bands you wish to select and the second the new band labels (in order). 
@@ -321,7 +324,9 @@ Map.addLayer(toClassify.clip(roi), {gamma: 2.1}, 'to classify');
 
 Training samples generally take the form of polygonal geometries within which pixels are sampled. As such, they can be created within GEE using the built-in geometry tools, or imported from existing shapefiles etc. The important thing here is that the training samples have a property which describes which class they represent. When using the GEE geometry tools, this can be achieved by clicking the cog icon next to the layer in the geometry list at the top left corner of the map view and selecting to import as a feature or featureCollection (I found that featureCollection works well in this instance). This will allow you to add a property to the training sample, such as 'class' etc. Generally classes are coded by number (i.e. water = 0, vegetation = 1, urban = 2). This allows easy visualisation and later accuracy assessment. The image below shows a composite image with a number of training polygons representing different classes (e.g. black for water, green for vegetation).
 
-![train](Images/training.png "Training samples")
+
+<img align="center" src="Images/training.png" alt="Training samples">
+
 
 ### Sampling the image
 
@@ -372,7 +377,8 @@ var palette = ['LIGHTSKYBLUE', 'DARKGREEN', 'LEMONCHIFFON','ORANGE'];
 Map.addLayer(classified.clip(roi), {palette: palette, min: 0, max: 4},'classified '+year);
 ```
 
-![class](Images/class.png "SVM classified image")
+<img align="center" src="Images/class.png" alt="SVM classified image">
+
 
 GEE expert [Gennadii Donchyts](https://twitter.com/gena_d) developed code to add support for [ColorBrewer](http://colorbrewer2.org/), a useful resource for choosing colour schemes for thematic maps with continuous or categorical data. The colorbrewer function can be sourced from Gennadii like below. To choose a specific colorbrewer palette, call colorbrewer.Palettes. and then the chosen set (e.g. BuGn, Greys, Set3 etc.) and the number of classes or breaks in square brackets. 
 
@@ -400,7 +406,9 @@ There are numerous strategies for how to select reference points: purely random,
 
 Accordingly, a thematically stratified random sampling technique is the best option, as shown in the image below. Equal numbers of reference points are randomly distributed within the area allocated to each class of a classified image. This maintains the statistical robustness of random sampling while ensuring that minority classes (i.e. land) are also properly represented.
 
-![strat rand image](Images/strat_rand2.png "Thematically stratified randomly distributed reference points")
+
+<img align="center" src="Images/strat_rand2.png" alt="Thematically stratified randomly distributed reference points">
+
 
 ### Sample size
 
@@ -633,5 +641,4 @@ var chart = ui.Chart.array.values(yValues, 0, xValues)
 // Print the chart.
 print(chart);
 ```
-
-![chart](Images/chart.PNG "Example chart")
+<img align="center" src="Images/chart.PNG" alt="Example chart">
