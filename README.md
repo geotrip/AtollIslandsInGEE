@@ -608,7 +608,7 @@ var urbanGraph = [area9901.get('4'), area0203.get('4'), area0406.get('4'), area0
 var totalGraph = [area9901.get('total_land'), area0203.get('total_land'), area0406.get('total_land'), area0710.get('total_land'), area1113.get('total_land'), area14.get('total_land'), area15.get('total_land'), area16.get('total_land'), area17.get('total_land')];
 ```
 
-To produce a chart, call one of the Chart functions. Here **ui.Chart.array.values()** is used, which takes an array (*y* axis values), the axis to use, and optionally *x* axis labels as arguments. The array is produced using the *ee.Array.cat()* function, which takes a list of the lists and the axis to use as arguments, and produces a combined array. 
+To produce a chart, call one of the Chart functions. Here **ui.Chart.array.values()** is used, which takes an array (*y* axis values), the axis to use, and optionally *x* axis labels as arguments. The array is produced using the *ee.Array.cat()* function, which takes a list of the lists and the axis to use as arguments, and produces a combined array. The *x* axis labels are a list of the dates that the classifications represent, and can be either strings (which require even intervals) or integers, as below.
 
 The charts behave as objects, and need to be printed to the console in order to viewed and interacted with, as in the code snippet below.
 
