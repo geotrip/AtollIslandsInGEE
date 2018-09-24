@@ -118,7 +118,7 @@ var t2Filt = ls8t2col
   .select('B[2-8]');
 ```
 
-Now that we have removed the cloudy pixels from each image in the collection, we can produce a composite image. To do this, the image collection needs to be converted into a single image. In GEE, going from multiple (an image collection) to single (a single composite) is achieved using a [reducer](https://developers.google.com/earth-engine/reducers_intro). There are reducers available for most aggregating statistics, such as mean, median, mode, min, max, standard deviation etc. I found median to provide the best results, with mean being more influenced by the extremes in pixel values contributed by cloud and cloud shadow that persisted through the masking process. Note that the composite is also clipped by the calling the *clip()* method with the roi object used as the input geometry. This makes the output much easier to analyse, but does not speed up reduction process. Again, you can also clip images using a geometry drawn within GEE.
+Now that we have removed the cloudy pixels from each image in the collection, we can produce a composite image. To do this, the image collection needs to be converted into a single image. In GEE, going from multiple (an image collection) to single (a single composite) is achieved using a [reducer](https://developers.google.com/earth-engine/reducers_intro). There are reducers available for most aggregating statistics, such as mean, median, mode, min, max, standard deviation etc. I found median to provide the best results, with mean being more influenced by the extremes in pixel values contributed by cloud and cloud shadow that persisted through the masking process. Note that the composite is also clipped by the calling the *clip()* method with the ROI object used as the input geometry. This makes the output much easier to analyse, but does not speed up reduction process. Again, you can also clip images using a geometry drawn within GEE.
 
 ```javascript
 var t2median = t2Filt
@@ -298,7 +298,7 @@ Export.image.toAsset({
 
 A couple of these arguments warrant further discussion. The description and assetId arguments are strings (i.e. text), but you can concatenate variable values onto text using +. In this example the variables **place** and **year** are concatenated to save having to rewrite each when the area or timespan of the composite being generated is changed (these variables are defined at the top of the code, and the year variable was also used to define the time range during the temporal filtering of the image collection). 
 
-The region is the geometry of the area you wish to export. Note that this needs to be a single polygon. If you use a multipolygon, the export will fail. An easy way to get around this issue is to either draw a polygon within GEE, or (as above) call the *geometry()* and *bounds()* methods (in that order) on an existing feature such as an roi polygon. The *geometry()* function creates a geometry object from the feature coordinates, and *bounds()* creates a single bounding box that contains all of the polygons that the feature may be comprised of. Note that if you do not specify this, it will default to the area of your map view at the time when the function is called (this can be useful when making figures).
+The region is the geometry of the area you wish to export. Note that this needs to be a single polygon. If you use a multipolygon, the export will fail. An easy way to get around this issue is to either draw a polygon within GEE, or (as above) call the *geometry()* and *bounds()* methods (in that order) on an existing feature such as an ROI polygon. The *geometry()* function creates a geometry object from the feature coordinates, and *bounds()* creates a single bounding box that contains all of the polygons that the feature may be comprised of. Note that if you do not specify this, it will default to the area of your map view at the time when the function is called (this can be useful when making figures).
 
 The scale argument controls the resolution at which your asset will be exported at. This is important to specify, as by default it is set to 1000 m. In most cases this will be the native resolution of your imagery (in this case the multispectral bands of Landsat 8, which are 30 m. If pan-sharpened imagery was being exported instead, this should be set to 15 m). Note that higher resolutions will take up more of your 250 GB asset allowance for the same geographic area. Also note that going beyond the native resolution of your imagery is pointless (i.e. exporting Landsat 8 data at 1 m resolution).
 
@@ -310,7 +310,7 @@ need to specify a higher limit using maxPixels. The current upper limit is 1e13.
 
 Now that the composite imagery has been generated and saved as assets, they can be classified. Classification involves using a special algorithm (a classifier) to determine which of a user defined group of classes each pixel is most likely to represent. In this case, decisions are based upon the spectral values of each pixel (per band) after the classifier has been trained using a labelled dataset of representative pixels. For more information on classification within GEE, see this [GEE Classification video tutorial](https://developers.google.com/earth-engine/tutorials#classification). For the purposes of this tutorial, a single date classification (training data sampled from one image) will be prepared initially, then multi-date classification will be discussed.  
 
-For ease of use, I created a new script for classification, keeping it separate from the code which produces the composites detailed above. To begin, in a new script the previously generated composite NDSV image was defined as the variable **toClassify** and clipped to the roi (the same as the previous script). Note that clipping does not carry over in exported assets: the area clipped out when generating the composite will be all black (i.e. null), but for visualistion purposes it is best to clip this off by clipping the image again. This code also adds the image to be classified to the map view (Map.addLayer(...)).
+For ease of use, I created a new script for classification, keeping it separate from the code which produces the composites detailed above. To begin, in a new script the previously generated composite NDSV image was defined as the variable **toClassify** and clipped to the ROI (the same as the previous script). Note that clipping does not carry over in exported assets: the area clipped out when generating the composite will be all black (i.e. null), but for visualistion purposes it is best to clip this off by clipping the image again. This code also adds the image to be classified to the map view (Map.addLayer(...)).
 
 ```javascript
 var toClassify = n17
@@ -516,7 +516,7 @@ var waterMiss = total.eq(4)
 var cleaned = toProcess.multiply(waterMiss.subtract(1)).multiply(-1)
 ```
 
-Where this process does not remove cloud miss-classification, it may be removed manually using a geometry drawn within GEE, as in the code snippet below, where the roi geometry is differenced with a hand drawn polygon **cloud0203**. If this is not required, it may be commented out. Note that the final cleaned image is masked using a composite with no gaps (in this case the 2016 composite **s16** - this fills in any gaps created by the last step with pixels equal to 0 (water) giving complete images, rather than having areas of masked pixels. 
+Where this process does not remove cloud miss-classification, it may be removed manually using a geometry drawn within GEE, as in the code snippet below, where the ROI geometry is differenced with a hand drawn polygon **cloud0203**. If this is not required, it may be commented out. Note that the final cleaned image is masked using a composite with no gaps (in this case the 2016 composite **s16** - this fills in any gaps created by the last step with pixels equal to 0 (water) giving complete images, rather than having areas of masked pixels. 
 
 ```javascript
 cleaned = cleaned.clip(roi)//.geometry().difference(cloud0203));
@@ -546,7 +546,7 @@ Export.image.toAsset({
 
 The final step is to generate useful area values from the computed classifications. This requires that the pixels which make up the classification be converted to area - GEE provides *ee.Image.pixelArea()* for this purpose.
 
-In a new script, establish the ROI and center the map view on it. You may wish to filter ROI: doing that here will be reflected in the results produced later on, including the graph. This can be useful in understanding the behaviour of induvildual atolls/polygons. 
+In a new script, establish the ROI and center the map view on it. You may wish to filter ROI: doing that here will be reflected in the results produced later on, including the graph. This can be useful in understanding the behaviour of individual atolls/polygons. 
 
 ```Javascript
 // Filter to a particular atoll
@@ -587,7 +587,7 @@ var defineArea = function(image){
 };
 ```
 
-Now this function can be called on each classification that represents a different year or orther timespan, as in the code snippet below.
+Now this function can be called on each classification that represents a different year or other timespan, as in the code snippet below.
 
 ```Javascript
 //LS7
@@ -606,7 +606,7 @@ var area17 = defineArea(s17);
 
 ### Graphing the results
 
-GEE has a robust [charting tools](https://developers.google.com/earth-engine/charts) which can very useful for displaying data with a temporal component, as is the case here. To produce a timeseries, create lists that call the area value for the chosen classes for every classification. This includes the total_land value calaculated eailier.
+GEE has a robust [charting tools](https://developers.google.com/earth-engine/charts) which can very useful for displaying data with a temporal component, as is the case here. To produce a time series, create lists that call the area value for the chosen classes for every classification. This includes the total_land value calculated earlier.
 
 ```Javascript
 var vegGraph = [area9901.get('1'), area0203.get('1'), area0406.get('1'), area0710.get('1'), area1113.get('1'), area14.get('1'), area15.get('1'), area16.get('1'), area17.get('1')];
@@ -650,7 +650,7 @@ The image below shows an example chart. Clicking the button highlighted in red w
 
 ### Exporting all land area values
 
-While you can use the code above across all atolls/polygons within your ROI, this summation does not preserve the individual land area values for every atoll. The code below exports a list of the total land area per atoll as a CSV file to google drive. It uses the function *sepArea()* which takes a classified image and an id as arguments, returning the combined area of the selected land classes. The following code uses a loop to call this function on every atoll/polygon, up to the number specfied in the loop, which needs to be set to the number of atolls/polygons within the ROI.
+While you can use the code above across all atolls/polygons within your ROI, this summation does not preserve the individual land area values for every atoll. The code below exports a list of the total land area per atoll as a CSV file to google drive. It uses the function *sepArea()* which takes a classified image and an id as arguments, returning the combined area of the selected land classes. The following code uses a loop to call this function on every atoll/polygon, up to the number specified in the loop, which needs to be set to the number of atolls/polygons within the ROI.
 
 ```Javascript
 // Function to generate land area per polygon/atoll
