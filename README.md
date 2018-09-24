@@ -556,7 +556,7 @@ Map.centerObject(roi)
 print(roi)
 ```
 
-The area allocated to each class within the given ROI can be **defineArea()** determined by multiplying the pixels of a class by the pixel area and summing the result. The function below automates this process, taking a classified image as an input and returning a dictionary of results. Each step has been commented. Note that changes will need to be made depending on the number of classes used in a given classification and which of those classes represent land.
+The area allocated to each class within the given ROI can be determined by multiplying the pixels of a class by the pixel area and summing the result. The function below, *defineArea()*, automates this process, taking a classified image as an input and returning a dictionary of results. Each step has been commented. Note that changes will need to be made depending on the number of classes used in a given classification and which of those classes represent land.
 
 ```Javascript
 // Function to generate per-class area values
