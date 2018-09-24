@@ -71,7 +71,7 @@ print('C1 T2 size: ',ls8t2col.size());
 So now the ls8t2col variable contains all available scenes which were within the space and date range we specified. However, if we were to preform a reduction (combine all the scenes within the collection into one composite) the results would be very poor, like in the example below. 
 
 
-<img align="center" src="Images/cloudy.png" alt="Cloud contaminated composites">
+<img align="center" src="Images/cloudy.PNG" alt="Cloud contaminated composites">
 
 
 Anyone who has attempted passive satellite-based remote sensing in the tropics will have struck the same issue: clouds. Given the footprint of a single Landsat scene is some 185 by 180 km, at the latitudes in which coral reefs occur having a cloud free image is definitely the exception rather than the rule. Clouds are the enemy and would need to be removed before any approach to automate island detection could be successfully implemented within GEE.
