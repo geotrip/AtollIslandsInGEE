@@ -620,7 +620,7 @@ var chart = ui.Chart.array.values(yValues, 0, xValues)
     .setChartType('LineChart')//I don't know why it needed both to show lines rather than just points
     .setSeriesNames(['Vegetated','Urban','Total Land'])
     .setOptions({
-      title: 'Areal Trajectory',
+      title: 'Areal Trajectory from '+xValues[0]+' to 2017',
       hAxis: {'title': 'Year'},
       vAxis: {'title': 'Area (km2)'},
       pointSize: 3,
@@ -633,3 +633,5 @@ var chart = ui.Chart.array.values(yValues, 0, xValues)
 // Print the chart.
 print(chart);
 ```
+
+![chart](Images/chart.PNG "Example chart")
