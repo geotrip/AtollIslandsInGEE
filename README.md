@@ -538,34 +538,48 @@ Export.image.toAsset({
 
 The final step is to generate useful area values from the computed classifications. This requires that the pixels which make up the classification be converted to area - GEE provides *ee.Image.pixelArea()* for this purpose.
 
+In a new script, establish the ROI and center the map view on it. You may wish to filter ROI: doing that here will be reflected in the results produced later on, including the graph. This can be useful in understanding the behaviour of induvildual atolls/polygons. 
+
 ```Javascript
 // Filter to a particular atoll
 roi = roi.filter(ee.Filter.eq('Id',2));
 Map.addLayer(roi,{},'ROI')
 Map.centerObject(roi)
 print(roi)
+```
 
+The area allocated to each class within the given ROI can be **defineArea()** determined by multiplying the pixels of a class by the pixel area and summing the result. The function below automates this process, taking a classified image as an input and returning a dictionary of results. Each step has been commented. Note that changes will need to be made depending on the number of classes used in a given classification and which of those classes represent land.
+
+```Javascript
 // Function to generate per-class area values
 var defineArea = function(image){
-  var areaImageSqM = ee.Image.pixelArea()
-    .clip(roi);
+  // Create an image where the pixel value is equivalent to the area of that pixel
+  var areaImageSqM = ee.Image.pixelArea().clip(roi);
+  // Create a dictionary (a list of lists) to store the result in
   var result = ee.Dictionary()
+    // Loop through the classes. i <= the number of classes in the classification
     for(var i = 0; i <= 4; i++) {
       var bin = image.eq(i)
+      // Perform the multiplication
       var area = bin.multiply(areaImageSqM)
+      // Calculate the sum
       area = area.reduceRegion({reducer: ee.Reducer.sum(),
         geometry: roi,
         scale: 30,
         maxPixels: 1e13
       });
+      // Store the area result (converted from m2 to km2) in a dictionary per class.
       var answer =  ee.Dictionary([(''+i), (ee.Number(area.get('classification')).divide(1e6))]);
+      // Combine the answers into the result dictionairy
       result = result.combine(answer);
     }
+    // Sum the pixels representing land classes and add it to the result dicationary as 'total'
     var total = ee.Number(result.get('1')).add(result.get('2')).add(result.get('4'))
     return result.combine(['total_land',total]);
 };
+```
 
-
+Now this function can be called on 
 
 //need to get results per roi area.
 var sepArea = function(image,id){
@@ -580,7 +594,7 @@ var sepArea = function(image,id){
       });
     return ee.Dictionary([(''+i), (ee.Number(area.get('classification')).divide(1e6))]);
 }; 
-
+```
 var year = '2017'
 print(roi.size())
 var result = ee.Dictionary();
@@ -601,5 +615,5 @@ var palette = ['LIGHTSKYBLUE', 'DARKGREEN',  'SILVER', 'LEMONCHIFFON','ORANGE','
 
 
 
-```
 
+[GEE charts](https://developers.google.com/earth-engine/charts)
