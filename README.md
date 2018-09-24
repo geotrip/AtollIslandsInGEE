@@ -615,14 +615,15 @@ var defineArea = function(image){
 Now this function can be called on each classification that represents a different year or other timespan, as in the code snippet below.
 
 ```Javascript
-//LS7
+// Call area function on all classifications
+// LS7
 var area9901 = defineArea(s9901);
 var area0203 = defineArea(s0203);
 var area0406 = defineArea(s0406);
 var area0710 = defineArea(s0710);
 var area1113 = defineArea(s1113);
 
-//LS8
+// LS8
 var area14 = defineArea(s14);
 var area15 = defineArea(s15);
 var area16 = defineArea(s16);
