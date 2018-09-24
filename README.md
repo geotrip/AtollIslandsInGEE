@@ -469,6 +469,11 @@ print('Consumer\'s accuracy (comission) (across):', errorMatrix.consumersAccurac
 print('Producer\'s accuracy (omission) (down):', errorMatrix.producersAccuracy());
 ```
 
+When printed, the results will look something like this: 
+
+<img align="center" src="Images/acc.PNG" alt="Error matrix example">
+
+
 You may also wish to produce a accuracy results in which one or more classes have been collapsed (joined and given the same value). This can be acheived using the *remap()* function in combination with reference points which have been edited to reflect this change. In the code snippet below, the land classes are remapped to a value of 1, while the non-land classes are remapped to a value of 0, creating a binary (land/non-land) classification with correspondingly higher accuracy values.
 
 ```javascript
