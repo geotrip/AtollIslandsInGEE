@@ -648,4 +648,40 @@ The image below shows an example chart. Clicking the button highlighted in red w
 <img align="center" src="Images/chart.PNG" alt="Example chart">
 
 
+### Exporting all land area values
+
+While you can use the code above across all atolls/polygons within your ROI, this summation does not preserve the individual land area values for every atoll. The code below exports a list of the total land area per atoll as a CSV file to google drive. It uses the function *sepArea()* which takes a classified image and an id as arguments, returning the combined area of the selected land classes. The following code uses a loop to call this function on every atoll/polygon, up to the number specfied in the loop, which needs to be set to the number of atolls/polygons within the ROI.
+
+```Javascript
+// Function to generate land area per polygon/atoll
+var sepArea = function(image,id){
+      var roiClipped = roi.filter(ee.Filter.eq('Id',id))
+      var areaImageSqM = ee.Image.pixelArea().clip(roiClipped)
+      // select pixels which are classified as one of the land classes
+      image = (image.eq(1).or(image.eq(2)).or(image.eq(4))).clip(roiClipped)
+      var area = image.multiply(areaImageSqM)
+      area = area.reduceRegion({reducer: ee.Reducer.sum(),
+        geometry: roiClipped.geometry(),
+        scale: 30,
+        maxPixels: 1e13
+      });
+    // Return a dictionary with the area values
+    return ee.Dictionary([(''+i), (ee.Number(area.get('classification')).divide(1e6))]);
+}; 
+
+var year = '2017'
+var result = ee.Dictionary();
+// set <= i to the number of atolls/polygons in the ROI. For some reason roi.size() does not work here.
+for(var i = 0; i <= 7; i++) {
+  result = result.combine(sepArea(s17,i))
+}
+print(result)
+
+//Export per atoll total land stats 
+Export.table.toDrive({
+  collection: ee.FeatureCollection(ee.Feature(null,result)),
+  description: 'seperated_new_palau_'+year, 
+  folder: 'palau'
+});
+```
 
