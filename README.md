@@ -442,6 +442,8 @@ Export.table.toDrive({
 
 Once the points have been ground-truthed, they can be uploaded back into GEE. From the Assets tab, click New, then Table upload. Click select, then navigate to the folder where your data is located and select it (making sure to include the required metadata files in the case of a .shp). Name the file, click ok and it will be 'ingested', becoming available within your GEE assets.
 
+### Calculating and presenting classification accuracy
+
 Once ingested, this data can be used to determine the accuracy of your classification. To do this, use the sampleRegions function again, this time using the reference points (here **fsm_aa**) instead of training samples. These samples are then classified by the same classifier to produce a validation dataset, which contains two properties, one with the reference ('true') class (here **'classifica'**) and the class allocated by the classifier (**'classification'**). The two are compared using the *errorMatrix()* function, as in the code snippet below.
 
 ```javascript
