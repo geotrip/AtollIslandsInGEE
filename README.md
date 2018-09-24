@@ -641,4 +641,11 @@ var chart = ui.Chart.array.values(yValues, 0, xValues)
 // Print the chart.
 print(chart);
 ```
+
+The image below shows an example chart. Clicking the button highlighted in red will open a fullscreen view that allows the chart to be downloaded as a CSV (spreadsheet of values) as well as SVG and PNG image formats.
+
+
 <img align="center" src="Images/chart.PNG" alt="Example chart">
+
+
+
