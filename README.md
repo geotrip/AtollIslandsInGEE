@@ -574,46 +574,62 @@ var defineArea = function(image){
       result = result.combine(answer);
     }
     // Sum the pixels representing land classes and add it to the result dicationary as 'total'
-    var total = ee.Number(result.get('1')).add(result.get('2')).add(result.get('4'))
+    var total = ee.Number(result.get('1')).add(result.get('4'))
     return result.combine(['total_land',total]);
 };
 ```
 
-Now this function can be called on 
+Now this function can be called on each classification that represents a different year or orther timespan, as in the code snippet below.
 
-//need to get results per roi area.
-var sepArea = function(image,id){
-      var roiClipped = roi.filter(ee.Filter.eq('Id',id))
-      var areaImageSqM = ee.Image.pixelArea().clip(roiClipped)
-      image = (image.eq(1).or(image.eq(2)).or(image.eq(4))).clip(roiClipped)
-      var area = image.multiply(areaImageSqM)
-      area = area.reduceRegion({reducer: ee.Reducer.sum(),
-        geometry: roiClipped.geometry(),
-        scale: 30,
-        maxPixels: 1e13
-      });
-    return ee.Dictionary([(''+i), (ee.Number(area.get('classification')).divide(1e6))]);
-}; 
+```Javascript
+//LS7
+var area9901 = defineArea(s9901);
+var area0203 = defineArea(s0203);
+var area0406 = defineArea(s0406);
+var area0710 = defineArea(s0710);
+var area1113 = defineArea(s1113);
+
+//LS8
+var area14 = defineArea(s14);
+var area15 = defineArea(s15);
+var area16 = defineArea(s16);
+var area17 = defineArea(s17);
 ```
-var year = '2017'
-print(roi.size())
-var result = ee.Dictionary();
-for(var i = 0; i <= 7; i++) {
-  result = result.combine(sepArea(s17,i))
-}
-print(result)
 
-//Export per atoll total land stats 
-Export.table.toDrive({
-  collection: ee.FeatureCollection(ee.Feature(null,result)),
-  description: 'seperated_splitGen_FSM_'+year, 
-  folder: 'FSM'
-});
+### Graphing the results
 
+GEE has a robust [charting tools](https://developers.google.com/earth-engine/charts) which can very useful for displaying data with a temporal component, as is the case here. To produce a timeseries, create lists that call the area value for the chosen classes for every classification. This includes the total_land value calaculated eailier.
 
-var palette = ['LIGHTSKYBLUE', 'DARKGREEN',  'SILVER', 'LEMONCHIFFON','ORANGE','BROWN'];
+```Javascript
+var vegGraph = [area9901.get('1'), area0203.get('1'), area0406.get('1'), area0710.get('1'), area1113.get('1'), area14.get('1'), area15.get('1'), area16.get('1'), area17.get('1')];
 
+var urbanGraph = [area9901.get('4'), area0203.get('4'), area0406.get('4'), area0710.get('4'), area1113.get('4'), area14.get('4'), area15.get('4'), area16.get('4'), area17.get('4')];
 
+var totalGraph = [area9901.get('total_land'), area0203.get('total_land'), area0406.get('total_land'), area0710.get('total_land'), area1113.get('total_land'), area14.get('total_land'), area15.get('total_land'), area16.get('total_land'), area17.get('total_land')];
+```
 
+To produce a chart, call one of the Chart functions. Here **ui.Chart.array.values()** is used, which takes an array (*y* axis values), the axis to use, and optionally *x* axis labels as arguments. The array is produced using the *ee.Array.cat()* function, which takes a list of the lists and the axis to use as arguments, and produces a combined array. 
 
-[GEE charts](https://developers.google.com/earth-engine/charts)
+The charts behave as objects, and need to be printed to the console in order to viewed and interacted with, as in the code snippet below.
+
+```Javascript
+var xValues = [2000,2002.5,2005,2008.5,2012,2014,2015,2016,2017]
+var yValues = ee.Array.cat([vegGraph, urbanGraph, totalGraph], 1);
+var chart = ui.Chart.array.values(yValues, 0, xValues)
+    .setChartType('ScatterChart')
+    .setChartType('LineChart')//I don't know why it needed both to show lines rather than just points
+    .setSeriesNames(['Vegetated','Urban','Total Land'])
+    .setOptions({
+      title: 'Areal Trajectory',
+      hAxis: {'title': 'Year'},
+      vAxis: {'title': 'Area (km2)'},
+      pointSize: 3,
+      series: {
+            0: {color: 'DARKGREEN'}, // veg
+            1: {color: 'ORANGE'}, // Urban
+            2: {color: 'BLACK'}  // total
+}});
+
+// Print the chart.
+print(chart);
+```
