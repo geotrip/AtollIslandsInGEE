@@ -675,7 +675,7 @@ The image below shows an example chart. Clicking the button highlighted in red w
 
 ### Exporting per atoll land area values
 
-While you can use the code above across all atolls/polygons within your ROI, this summation does not preserve the individual land area values for every atoll. The code below exports a list of the total land area per atoll as a CSV file to google drive. It uses the function *sepArea()* which takes a classified image and an id as arguments, returning the combined area of the selected land classes. The following code uses a loop to call this function on every atoll/polygon, up to the number specified in the loop, which needs to be set to the number of atolls/polygons within the ROI.
+While you can use the code above across all atolls/polygons within your ROI, this summation does not preserve the individual land area values for every atoll. This issue was loved via the following code, which exports a list of the total land area per atoll as a CSV file to google drive. It uses the function *sepArea()* which takes a classified image and an id as arguments, returning the combined area of the selected land classes. The following code uses a loop to call this function on every atoll/polygon, up to the number specified in the loop, which needs to be set to the number of atolls/polygons within the ROI.
 
 ```Javascript
 // Function to generate land area per polygon/atoll
