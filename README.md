@@ -467,6 +467,24 @@ print('Consumer\'s accuracy (comission) (across):', errorMatrix.consumersAccurac
 print('Producer\'s accuracy (omission) (down):', errorMatrix.producersAccuracy());
 ```
 
+You may also wish to produce a accuracy results in which one or more classes have been collapsed (joined and given the same value). This can be acheived using the *remap()* function in combination with reference points which have been edited to reflect this change. In the code snippet below, the land classes are remapped to a value of 1, while the non-land classes are remapped to a value of 0, creating a binary (land/non-land) classification with correspondingly higher accuracy values.
+
+```javascript
+// Produce binary accuracy
+var binary = toClassify.remap([0,1,2,3,4],[0,1,1,0,1])
+Map.addLayer(binary,{max: 1, min: 0},'Binary')
+
+var binarySample = binary.sampleRegions({
+	collection: binaryAA,
+	properties: ['classifica'],
+	scale: 30
+});
+
+var errorMatrixBinary = binarySample.errorMatrix('class', 'remapped')
+print('Binary Accuracy:', errorMatrixBinary.accuracy());
+print('Binary Confusion table:', errorMatrixBinary);
+```
+
 Exporting the classified image is very similar to exporting the composite image. However, since the classification is categorical rather than continuous, future visualisation will work better if the 'mode' pyramiding policy is selected. GEE automatically makes lower resolution versions of your images to speed up visualisation when operating at large scales (zoomed out). The pyramiding policy of an image determines how these lower quality versions are generated. The default (mean) works well for normal images as it averages the pixel values when you are zoomed out, but since the average of class values is meaningless, using the most prevalent class (mode) is a better choice. 
 
 ```javascript
