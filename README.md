@@ -50,7 +50,7 @@ Now that the ROI has been added, we can create an [image collection](https://dev
 ### Spatial and temporal filtering
 Obviously, we only want to create a composite of certain areas and within a certain date range - so the initial image collection, which contains every scene in that collection, will need to be filtered. Filtering an image collection by date is achieved by calling the filterDate method on your image collection. The method takes a start date and an end date. I was attempting to produce annual composites, so the code reads from a list of years, but you can just as easily manually write in dates in the 'YYYY-MM-DD' format instead.
 
-Filtering spatially is simple as we have an ROI object already, but you may also do this manually by using a geometry drawn within GEE instead. Simply call the .filterBounds method on your image collection with the geometry or feature you want to use in brackets.
+Filtering spatially is simple as we have an ROI object already, but you may also do this manually by using a geometry drawn within GEE instead. Simply call the *filterBounds()* method on your image collection with the geometry or feature you want to use in brackets.
 
 Once the image collection has been filtered, the collection is printed to the console, which allows it to easily be reviewed, with the metadata of the collection and each scene available. The size (number of scenes) of the collection post filtering is also printed for reference.
 
@@ -70,7 +70,7 @@ print('C1 T2 size: ',ls8t2col.size());
 
 
 ### Cloud masking
-So now the ls8t2col variable contains all available scenes which were within the space and date range we specified. However, if we were to preform a reduction (combine all the scenes within the collection into one composite) the results would be very poor, like in the example below. 
+So now the **ls8t2col** variable contains all available scenes which were within the space and date range we specified. However, if we were to preform a reduction (combine all the scenes within the collection into one composite) the results would be very poor, like in the example below. 
 
 
 <img align="center" src="Images/cloudy.PNG" alt="Cloud contaminated composites">
@@ -177,7 +177,7 @@ var final = (medT1.unmask().add(filler.unmask())).clip(roi)
 ```
 
 ### A quick note on built-in GEE Landsat algorithims
-GEE has a number of built-in algorithms specific to particular sensors, including Landsat. These include simpleCloudScore (*ee.Algorithms.Landsat.simpleCloudScore()*), simpleComposite (*ee.Algorithms.Landsat.simpleComposite()*) and methods for TOA or SR conversion. These require raw Landsat data, rather than the TOA used here. The simpleCompostie algorithm works very well, and can be used to quickly produce composites of large areas. However, the cloud-masking approach it employs struggles with the bright coral sands found within atoll environments and as such can produce notably inferior results to the (much more involved) workflow outlined above. Outside of these locations it works very well. [This script](https://code.earthengine.google.com/6cec9db5f8b866afb64cdc7e3f752c76) shows how simpleComposite works and gives and example generated from six months of Landsat 8 T1 scenes. 
+GEE has a number of built-in algorithms specific to particular sensors, including Landsat. These include simpleCloudScore *ee.Algorithms.Landsat.simpleCloudScore()*, simpleComposite *ee.Algorithms.Landsat.simpleComposite()* and methods for TOA or SR conversion. These require raw Landsat data, rather than the TOA used here. The simpleCompostie algorithm works very well, and can be used to quickly produce composites of large areas. However, the cloud-masking approach it employs struggles with the bright coral sands found within atoll environments and as such can produce notably inferior results to the (much more involved) workflow outlined above. Outside of these locations it works very well. [This script](https://code.earthengine.google.com/6cec9db5f8b866afb64cdc7e3f752c76) shows how simpleComposite works and gives and example generated from six months of Landsat 8 T1 scenes. 
 
 ### Pan-sharpening
 Now that a final composite has been produced, any additional transformations can be undertaken such as pan-sharpening and band ratioing. [Pan-sharpening](https://developers.google.com/earth-engine/image_transforms) is easy to achieve, but make sure that the resulting sharpened image is exported at the resolution of the pan rather than multispectral bands. 
