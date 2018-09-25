@@ -713,3 +713,7 @@ Export.table.toDrive({
 });
 ```
 
+### Vectorising the classified results
+
+
+
