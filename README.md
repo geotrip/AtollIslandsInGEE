@@ -578,6 +578,8 @@ Export.image.toAsset({
 <a name="area"></a>
 ## Deriving area measurements
 
+###### [Working example of composite creation](https://code.earthengine.google.com/413d836210cdb2b3a8d5efdec100c2c0)
+
 The final step is to generate useful area values from the computed classifications. This requires that the pixels which make up the classification be converted to area - GEE provides *ee.Image.pixelArea()* for this purpose.
 
 In a new script, establish the ROI and center the map view on it. You may wish to filter ROI: doing that here will be reflected in the results produced later on, including the graph. This can be useful in understanding the behaviour of individual atolls/polygons. 
@@ -722,5 +724,18 @@ Export.table.toDrive({
 
 ### Vectorising the classified results
 
+You may wish to export your classifications as vector polygons rather than raster images for visualisation purposes. This is simple to do with GEE using the *reduceToVectors()* function. In the code snippet below, classes 1 and 2 (which represent land in this classification) are vectorised and exported to google drive.
 
+```javascript
+var v17 = (x17.eq(1).or(x17.eq(2))).reduceToVectors({
+  geometry: roi,
+  scale: 30,
+  geometryType: 'polygon',
+  maxPixels: 1e13
+})
 
+Export.table.toDrive({collection: v17,
+  description: 'spratly_small_2017',
+  folder: 'EE_output_geojson',
+  fileFormat: 'GeoJSON'});
+```
