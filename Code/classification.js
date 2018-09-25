@@ -4,14 +4,15 @@ var year ='2017';
 print('Year: '+year);
 
 
-// Select the image to be classified, and the true- colour image to use as a reference
+//Select the image to be classified, and the true- colour image to use as a reference
 
 var toClassify = n17
 toClassify = toClassify.clip(roi);
+
+//Center the map view on the ROI
 Map.centerObject(roi)
 
-// Add the composite images to the map
-
+//Add the current image and the images to be classified to the map
 var ls7viz = {gamma: 2, bands: 'B3,B2,B1'};
 //var ls8viz = {gamma: 2.1}
 
@@ -56,7 +57,6 @@ var training2 = NDmedianL8.sampleRegions({
 // Combine required training samples into one combined sample set
 var join = training.merge(training2)
 
-// Select the classifier
 var classifier = ee.Classifier.svm();
 
 // Train the chosen classifier 
@@ -71,29 +71,24 @@ var classified = toClassify.classify(fullClassifier);
 
 
 
-// Visualise the classification
+// Visualise the resulting classification
 
 // var colorbrewer = require('users/gena/packages:colorbrewer')
 // var palette = colorbrewer.Palettes.Set2[4]
-
 var palette = ['LIGHTSKYBLUE', 'DARKGREEN', 'LEMONCHIFFON','ORANGE'];
-
 Map.addLayer(classified.clip(roi), {palette: palette, min: 0, max: 4},'classified '+year);
 
 
-
-// Create AA points 
+// Create and export reference points
 var aaPoints = classified.stratifiedSample({
   numPoints: 50, classBand: 'classification', region: roi, dropNulls: true, geometries: true})
 
 Export.table.toDrive({collection: aaPoints, description:'aa_points', folder:'seperate_outputs', fileFormat :'SHP'})
 
 
-
-
-
 // Print imported ground-truthed AA points
 print(palau_aa)
+
 
 // Sample the image to classified at the reference points
 var testing = toClassify.sampleRegions({
@@ -114,22 +109,25 @@ print('Accuracy: (correct/total)', errorMatrix.accuracy());
 print('Consumer\'s accuracy (comission) (across):', errorMatrix.consumersAccuracy());
 print('Producer\'s accuracy (omission) (down):', errorMatrix.producersAccuracy());
 
-// // Produce binary accuracy
-// var binary = toClassify.remap([0,1,2,3,4],[0,1,1,0,1])
-// Map.addLayer(binary,{max: 1, min: 0},'Binary')
 
-// var binarySample = binary.sampleRegions({
-// 	collection: bin,
-// 	properties: ['classifica'],
-// 	scale: 30
-// });
+// Produce binary image and assess accuracy
+// Collaspe classes into land and non-land using remap, add result to the map
+var binary = classified.remap([0,1,3,4],[0,1,0,1])
+Map.addLayer(binary,{max: 1, min: 0},'Binary land/non-land classification',false)
 
-// var errorMatrixBinary = binarySample.errorMatrix('class', 'remapped')
-// print('Binary Accuracy:', errorMatrixBinary.accuracy());
-// print('Binary Confusion table:', errorMatrixBinary);
+// Get the value of the reference pixels from the new binary classification
+var binarySample = binary.sampleRegions({
+	collection: palau_binary,
+	properties: ['classifica'],
+	scale: 30
+});
 
+// Produce and print an error matrix of the binary results
+var errorMatrixBinary = binarySample.errorMatrix('classifica', 'remapped')
+print('Binary Accuracy:', errorMatrixBinary.accuracy());
+print('Binary Confusion table:', errorMatrixBinary);
 
-// Export the classified result
+//Export the classified result
 Export.image.toAsset({
   image: classified, 
   description: year+'_palau_split_urb_veg_SVM_class',
