@@ -313,7 +313,7 @@ need to specify a higher limit using maxPixels. The current upper limit is 1e13.
 <a name="class"></a>
 ## Composite classification
 
-###### [Working example of composite classification](https://code.earthengine.google.com/beb1996a3ef743d39402a77a71e43bc2)
+###### [Working example of composite classification (including accuracy assessment)](https://code.earthengine.google.com/beb1996a3ef743d39402a77a71e43bc2)
 
 Now that the composite imagery has been generated and saved as assets, they can be classified. Classification involves using a special algorithm (a classifier) to determine which of a user defined group of classes each pixel is most likely to represent. In this case, decisions are based upon the spectral values of each pixel (per band) after the classifier has been trained using a labelled dataset of representative pixels. For more information on classification within GEE, see this [GEE Classification video tutorial](https://developers.google.com/earth-engine/tutorials#classification). For the purposes of this tutorial, a single date classification (training data sampled from one image) will be prepared initially, then multi-date classification will be discussed.  
 
@@ -516,6 +516,8 @@ Export.image.toAsset({
 
 <a name="filt"></a>
 ## Post classification filtering
+
+###### [Working example of cloud filtering](https://code.earthengine.google.com/f6e705ff5ea5463dcc99a1150e27e90a)
 
 A common practice within classification workflows is post-classification filtering, where the raw classifications are processed to (hopefully) remove the so called 'speckle' (aka 'salt and pepper') effect, where there are numerous single pixels classed as something different to their neighbour. Generally this issue is addressed through the use of a generalising, window based function such as majority filtering, sieving etc. GEE supports focal based [morphological operations](https://developers.google.com/earth-engine/image_morph) to achieve this. However, this approach is not appropriate in this context as the minority landcovers (i.e. land classes) are the target: applying a traditional filter like those listed above will likely erase smaller island features from the classification, given they are often comprised of only a small number of pixels and surrounded by far more prevalent classes such as reef or water.
 
