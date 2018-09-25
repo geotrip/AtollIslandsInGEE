@@ -35,7 +35,7 @@ Accordingly, I set out to develop an approach to monitoring atoll island land ar
 
 Before creating the composite images, it is a good idea to produce region of interest (ROI) polygons which encompass the target features. The reasons for this were threefold: such geometries were required to spatially filter the available imagery to retrieve scenes which covered targeted areas; it allowed the composite images to be clipped, saving storage space and reducing the processing load by excluding unrequired pixels; finally, it permitted classified results to be separated as meaningful units.
 
-FOr this research, 278 separate polygons were produced in QGIS 3.0, each inclduing an atoll or small group of promixal islands. Each ROI was given an individual numerical ID, allowing specific features, or groups of features, to be included or excluded from the analysis. The ROI polygon can be uploaded as a GEE asset [(learn about that here)](https://developers.google.com/earth-engine/importing). The following code creates an ROI variable, adds to it the map view and centres the map screen on it. 
+For this research, 278 separate polygons were produced in QGIS 3.0, each inclduing an atoll or small group of promixal islands. Each ROI was given an individual numerical ID, allowing specific features, or groups of features, to be included or excluded from the analysis. The ROI polygon can be uploaded as a GEE asset [(learn about that here)](https://developers.google.com/earth-engine/importing). The following code creates an ROI variable, adds to it the map view and centres the map screen on it. 
 
 ```javascript
 //Select roi
