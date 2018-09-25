@@ -30,9 +30,7 @@ Accordingly, I set out to develop an approach to monitoring atoll island land ar
 <a name="data"></a>
 ## Creating composite images
 
-<a href="https://code.earthengine.google.com/01654d6ead91c7d0372d1b8bde6d34ac" target="_blank">###### Working example of composite creation.</a>
-
-Read more: https://html.com/attributes/a-target/#ixzz5S4ryXyWg
+<a href="https://code.earthengine.google.com/01654d6ead91c7d0372d1b8bde6d34ac" target="_blank">Working example of composite creation.</a>
 
 Before creating the composite images, it is a good idea to produce region of interest (ROI) polygons which encompass the target features. The reasons for this were threefold: such geometries were required to spatially filter the available imagery to retrieve scenes which covered targeted areas; it allowed the composite images to be clipped, saving storage space and reducing the processing load by excluding unrequired pixels; finally, it permitted classified results to be separated as meaningful units.
 
