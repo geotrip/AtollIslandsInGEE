@@ -180,6 +180,31 @@ var filler = t2median.updateMask(fillerMask);
 var final = (medT1.unmask().add(filler.unmask())).clip(roi)
 ```
 
+You may also wish to use a single scene instead of a median composite, particularly when working with poorly co-registered Landsat 7 data. The following code snippet shows how this process can be achieved for a single atoll/polygon, with the ID 16. The initial codeadds all the available T2 Landsat 7 images to the map which contain the polygon/atoll, sorting by cloud cover. It also prints a list of these images to the console, which can be used for fining the required scene ID. After selecting the best scene (or scenes), the polygon/atoll can be clipped out (just as above), then after calling the best scene explicitly by its ID (i.e. ee.Image('LANDSAT/LE07/C01/T2_TOA/LE07_095055_20041130')) it can be added to the existing composite by combining both in an imageCollection, then reducing it to a single image. 
+
+```javascript
+// Use this to pull out single scenes which may provide superior results compared to a median reduction
+var targetSingleScene = ls7t2col.filterBounds(roi.filter(ee.Filter.eq('Id',16))).sort('CLOUD_COVER')
+var features = targetSingleScene.getInfo().features;
+for (var i = 0; i < features.length; i++) {
+  var feature = features[i];
+  Map.addLayer(ee.Image(feature.id), {bands: 'B3,B2,B1', gamma: 2}, feature.id,false);
+  //Map.addLayer(ee.Image(feature.id), {bands: 'BQA', min: 0, max: 65535}, feature.id+' BQA');
+}
+print(targetSingleScene)
+
+// Here the single good scene can be injected into the final composite
+
+final = final.clip(roi
+.filter(ee.Filter.neq('Id',16))
+)
+
+var good0 = ee.Image('LANDSAT/LE07/C01/T2_TOA/LE07_095055_20041130')
+.select('B1','B2','B3','B4','B5','B7','B8').clip(roi.filter(ee.Filter.eq('Id',16)));
+
+final = ee.ImageCollection([final, good0]).max().clip(roi)
+```
+
 ### A quick note on built-in GEE Landsat algorithims
 GEE has a number of built-in algorithms specific to particular sensors, including Landsat. These include simpleCloudScore *ee.Algorithms.Landsat.simpleCloudScore()*, simpleComposite *ee.Algorithms.Landsat.simpleComposite()* and methods for TOA or SR conversion. These require raw Landsat data, rather than the TOA used here. The simpleCompostie algorithm works very well, and can be used to quickly produce composites of large areas. However, the cloud-masking approach it employs struggles with the bright coral sands found within atoll environments and as such can produce notably inferior results to the (much more involved) workflow outlined above. Outside of these locations it works very well. [This script](https://code.earthengine.google.com/6cec9db5f8b866afb64cdc7e3f752c76) shows how simpleComposite works and gives and example generated from six months of Landsat 8 T1 scenes. 
 
