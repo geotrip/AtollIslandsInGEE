@@ -32,7 +32,7 @@ Accordingly, I set out to develop an approach to monitoring atoll island land ar
 
 ###### [Working example of composite creation for Landsat 8](https://code.earthengine.google.com/01654d6ead91c7d0372d1b8bde6d34ac)
 ###### [Working example of composite creation for Landsat 7](https://code.earthengine.google.com/619e0e772610333c86be3f560f9c5237)
-###### [Collection of all composite imagery](https://code.earthengine.google.com/c5bb50e762b793dffbff140503f0a33f)
+###### [Collection of all composite imagery and ROIs](https://code.earthengine.google.com/b21f3755b605c6937b0bc6d3bf51aaa0)
 
 Before creating the composite images, it is a good idea to produce region of interest (ROI) polygons which encompass the target features. The reasons for this were threefold: such geometries were required to spatially filter the available imagery to retrieve scenes which covered targeted areas; it allowed the composite images to be clipped, saving storage space and reducing the processing load by excluding unrequired pixels; finally, it permitted classified results to be separated as meaningful units.
 
